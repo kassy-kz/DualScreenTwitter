@@ -15,8 +15,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -34,11 +36,9 @@ public class MainActivity extends Activity implements OnClickListener {
     
     private static final String INTENT_ACTION_SLIDE = "com.kyocera.intent.action.SLIDE_OPEN";
     CustomReceiver mReceiver;
-
+    private static MainActivity self;
     
 	private static final int TWITTER_AUTHORIZE = 0;
-	private static final String CONSUMER_KEY = "0puDNPmm5z6ZKtIGwjzgow";
-	private static final String CONSUMER_SECRET = "CZQ4abCLZpkOJ1QjFTRl9bcez8Y8PqazgLnqIwfNtw";
     private static final String TAG = null;
 	
 	private Twitter mTwitter = null;
@@ -54,6 +54,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	private boolean mIsAuthorized = false;
 	private ListView mListView1;
 	private ListView mListView2;
+
+	private AuthAsyncTask mTask;
 
 	// Receive thread
 	private Runnable mRunnable_normal = new Runnable() {
@@ -90,9 +92,10 @@ public class MainActivity extends Activity implements OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        self = this;
         setContentView(R.layout.main);        
 
-        // DTS Setting
+        // Echo DTS Setting 
         DualScreen.restrictOrientationAtFullScreen( this, ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED );
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         setScreenLayout();
@@ -100,27 +103,15 @@ public class MainActivity extends Activity implements OnClickListener {
         mReceiver = new CustomReceiver();
         IntentFilter slideFilter = new IntentFilter(INTENT_ACTION_SLIDE);
         registerReceiver(mReceiver, slideFilter);
-        
-        // Twitter Setting
-		mDialog = new ProgressDialog(this);
-		mDialog.setMessage(getString(R.string.auth_wait_message));
-		mDialog.setIndeterminate(true);
-		mDialog.show();
-        new Thread() {
-        	@Override
-        	public void run() {
-        		try {
-        			mTwitter = new TwitterFactory().getInstance();
-        			mTwitter.setOAuthConsumer(CONSUMER_KEY, CONSUMER_SECRET);
-        			mToken = mTwitter.getOAuthRequestToken();
-	        		mAuthorizeUrl = mToken.getAuthorizationURL();
-	        		mHandler.post(mRunnable_normal);
-        		} catch(TwitterException e) {
-        			Log.d("TEST", "Exception", e);
-        			mHandler.post(mRunnable_error);
-        		}
-        	}
-        }.start();
+
+        // 保存したAccessToken取得
+        mAccessToken = AppUtils.loadAccessToken(this);
+
+        // 認証してない場合だけ認証処理するよ
+        if(mAccessToken == null) {
+            mTask = new AuthAsyncTask(this);
+            mTask.execute(0);
+        }
     }
     
 	@Override
@@ -139,6 +130,8 @@ public class MainActivity extends Activity implements OnClickListener {
         setScreenLayout();
     }
 
+	
+	// 認証処理から帰ってきたとき
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -157,7 +150,12 @@ public class MainActivity extends Activity implements OnClickListener {
 					@Override
 					public void run() {
 						try {
+						    // 認証が成功したあとの処理
 							mAccessToken = mTwitter.getOAuthAccessToken(mToken, pincode);
+
+							// Preferenceに保存
+                            // 本番モードのみ
+                            AppUtils.saveAccessToken(self, mAccessToken);
 							
 							// アクセス・トークンが取得できたら、リソース解放して、インスタンス再生成
 							mTwitter.shutdown();
@@ -165,7 +163,7 @@ public class MainActivity extends Activity implements OnClickListener {
 							
 							TwitterFactory factory = new TwitterFactory();
 							mTwitter = factory.getInstance();
-							mTwitter.setOAuthConsumer(CONSUMER_KEY, CONSUMER_SECRET);
+							mTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
 							mTwitter.setOAuthAccessToken(mAccessToken);
 							
 						} catch(TwitterException e) {
@@ -265,4 +263,92 @@ public class MainActivity extends Activity implements OnClickListener {
             setScreenLayout();
         }
     };
+    
+    /**
+     * 認証処理の非同期タスク
+     */
+    public class AuthAsyncTask extends AsyncTask<Integer, Void, Integer>{
+        private Activity mActivity;
+        private static final int RESULT_OK = 0;
+        private static final int RESULT_NG = -1;
+        private static final int RESULT_AUTHED = 1;
+
+        public AuthAsyncTask(Activity activity) {
+            mActivity = activity;
+        }
+
+        // 前処理 これはUIスレッドでの処理ね
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            // ダイアログを表示
+            mDialog = new ProgressDialog(mActivity);
+            mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mDialog.setMessage("認証処理をしています...");
+            mDialog.setCancelable(true);
+            mDialog.setOnDismissListener(mDismissListener);
+            mDialog.show();
+        }
+        
+        // ワーカースレッドでの処理ね
+        @Override
+        protected Integer doInBackground(Integer... arg0) {
+
+            // 保存した情報を呼び出すのだぜ
+            SharedPreferences shPref = mActivity.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+
+            // 保存したAccessToken取得
+            mAccessToken = AppUtils.loadAccessToken(mActivity);
+            
+            // accesstoken がない場合（認証まだな場合）
+            if(mAccessToken == null) {
+                // 初回の認証処理
+                mTwitter = new TwitterFactory().getInstance();
+                mTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
+                try {
+                    mToken = mTwitter.getOAuthRequestToken();
+                    mAuthorizeUrl = mToken.getAuthorizationURL();
+                    return RESULT_OK;
+                } catch (TwitterException e) {
+                    e.printStackTrace();
+                    return RESULT_NG;
+                }
+
+            
+            // すでに認証できてる場合
+            } else {
+                return RESULT_AUTHED;
+            }
+        }
+
+        // 後処理 これはUIスレッドでの処理ね
+        @Override
+        protected void onPostExecute (Integer result) {
+            super.onPostExecute(result);
+            if(result == RESULT_OK) {
+                if(mDialog != null) {
+                    mDialog.dismiss();
+                }
+                Intent intent = new Intent(mActivity, TwitterAuthorizeActivity.class);
+                intent.putExtra(AppUtils.AUTH_URL, mAuthorizeUrl);
+                mActivity.startActivityForResult(intent, TWITTER_AUTHORIZE);
+            } else if(result == RESULT_NG) {
+                if(mDialog != null) {
+                    mDialog.dismiss();
+                }
+                Toast.makeText(mActivity, R.string.twitter_auth_error, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        /**
+         * ダイアログ消去リスナー
+         * ダイアログが消えるとき、アクティビティも消えるのです。
+         */
+        private DialogInterface.OnDismissListener mDismissListener = new DialogInterface.OnDismissListener(){
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+            }
+        };
+    }
 }
