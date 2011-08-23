@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DSTwitter</string>
+    <string name="title_screen_status">Screen status</string>
+    <string name="btn_update">Update</string>
+    <string name="mode_fullscreen">Screen mode: Full</string>
+    <string name="mode_normalscreen">Screen mode: Normal</string>
+    <string name="orientation_portrait">Orientation: Portrait</string>
+    <string name="orientation_landscape">Orientation: Landscape</string>
+    <string name="rotation_0">Rotation: 0°</string>
+    <string name="rotation_90">Rotation: 90°</string>
+    <string name="rotation_180">Rotation: 180°</string>
+    <string name="rotation_270">Rotation: 270°</string>
+    <string name="title_setting_fix_orientation">Fix orientation setting</string>
+    <string name="radio_none">None</string>
+    <string name="radio_portrait">Portrait</string>
+    <string name="radio_landscape">Landscape</string>
+    <string name="msg_slide_opened">Slide Opened.</string>
+    <string name="msg_slide_closed">Slide Closed.</string>
+    <string name="msg_configuration_changed">Configuration Changed.</string>
+    <string name="twitter_auth_error">認証に失敗しました。</string>
+    <string name="btn_pin">PIN</string>
+    <string name="twitter_timeline_title">TimeLine</string>
+    <string name="no_timeline">タイムラインを取得していません。</string>
+    <string name="auth_wait_message">Twitter認証中…</string>
+    <string name="wait_timeline_message">タイムライン取得中…</string>
+    
+</resources>

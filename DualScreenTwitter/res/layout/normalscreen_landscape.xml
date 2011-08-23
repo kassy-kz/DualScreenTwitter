@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+  <TextView android:layout_height="wrap_content" android:text="@string/title_screen_status" android:layout_width="fill_parent" android:textColor="#FFFFFF" android:background="#808080" android:textSize="16dip"></TextView>
+  <LinearLayout android:layout_height="wrap_content" android:orientation="vertical" android:layout_width="match_parent">
+    <TextView android:layout_height="wrap_content" android:id="@+id/TvScreenMode" android:textSize="18dip" android:layout_width="match_parent" />
+    <TextView android:layout_height="wrap_content" android:id="@+id/TvOrientation" android:textSize="18dip" android:layout_width="match_parent" />
+    <TextView android:layout_height="wrap_content" android:id="@+id/TvRotation" android:textSize="18dip" android:layout_width="match_parent" />
+  </LinearLayout>
+
+  <TextView android:layout_height="wrap_content" android:text="@string/title_setting_fix_orientation" android:textColor="#FFFFFF" android:background="#808080" android:textSize="16dip" android:layout_width="match_parent"></TextView>
+
+  <RadioGroup android:layout_width="match_parent" android:layout_height="wrap_content">
+    <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/RadioNone" android:text="@string/radio_none"></RadioButton>
+    <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/radio_portrait" android:id="@+id/RadioPortrait"></RadioButton>
+    <RadioButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/RadioLandscape" android:text="@string/radio_landscape"></RadioButton>
+  </RadioGroup>
+
+</LinearLayout>
