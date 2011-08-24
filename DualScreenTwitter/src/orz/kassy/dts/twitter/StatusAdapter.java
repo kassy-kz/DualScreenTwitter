@@ -1,4 +1,4 @@
-package orz.kassy.dts.adapter;
+package orz.kassy.dts.twitter;
 
 import java.util.List;
 

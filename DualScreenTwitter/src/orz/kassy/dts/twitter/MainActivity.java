@@ -1,6 +1,5 @@
 package orz.kassy.dts.twitter;
 
-import orz.kassy.dts.adapter.StatusAdapter;
 import orz.kassy.dts.image.ImageCache;
 import com.kyocera.dualscreen.DualScreen;
 import twitter4j.Twitter;
