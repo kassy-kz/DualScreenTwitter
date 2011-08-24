@@ -37,6 +37,7 @@ public class StatusAdapter extends ArrayAdapter<Status> {
 			holder = new ViewHolder();
 			holder.img_icon = (ImageView)convertView.findViewById(R.id.img_icon);
 			holder.lbl_screenname = (TextView)convertView.findViewById(R.id.lbl_screenname);
+//            holder.lbl_name = (TextView)convertView.findViewById(R.id.lbl_name);
 			holder.lbl_tweet = (TextView)convertView.findViewById(R.id.lbl_tweet);
 			convertView.setTag(holder);
 		} else {
@@ -47,7 +48,9 @@ public class StatusAdapter extends ArrayAdapter<Status> {
 		if(status != null) {
 			String strKey = status.getUser().getScreenName();
 			String strName = status.getUser().getName();
-			holder.lbl_screenname.setText(strName);
+//			holder.lbl_screenname.setText(strName);
+            holder.lbl_screenname.setText(strKey);
+//            holder.lbl_name.setText(strKey);
 			holder.lbl_tweet.setText(status.getText());
 			if(ImageCache.getImage(strKey) == null) {
 				if(holder.task == null) {
@@ -72,6 +75,7 @@ public class StatusAdapter extends ArrayAdapter<Status> {
 	class ViewHolder {
 		ImageView img_icon;
 		TextView lbl_screenname;
+		TextView lbl_name;
 		TextView lbl_tweet;
 		ThumbnailTask task;
 	}

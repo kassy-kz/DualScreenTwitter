@@ -1,48 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="horizontal">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
-<LinearLayout android:id="@+id/LayoutSecondaryScreen"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_weight="1">
-    <TextView
-        android:id="@+id/TextView01"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:text="Your TimeLine"
-        android:textSize="24sp"></TextView>
-    <ListView
-        android:id="@+id/listview1"
+    <LinearLayout
+        android:id="@+id/LayoutSecondaryScreen"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/TextView01"></ListView>
-</LinearLayout>
+        android:layout_weight="1">
+        <TextView
+            android:id="@+id/TextView01"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:text="Home Timeline"
+            android:textSize="12dip"></TextView>
+        <ListView
+            android:id="@+id/listview1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/TextView01"></ListView>
+    </LinearLayout>
 
-<RelativeLayout android:id="@+id/LayoutPrimaryScreen"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#7FFF00"
-                android:layout_weight="1">
-    <TextView
-        android:id="@+id/TextView01"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:text="Your Friend List"
-        android:textSize="24sp"></TextView>
-    <ListView
-        android:id="@+id/listview2"
+    <RelativeLayout
+        android:id="@+id/LayoutPrimaryScreen"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#7FFF00"
-        
-        android:layout_below="@+id/TextView01"></ListView>
+        android:layout_weight="1">
+        <TextView
+            android:id="@+id/TextView01"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:text="Your Friend List"
+            android:textSize="12dip"></TextView>
+        <ListView
+            android:id="@+id/listview2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#7FFF00"
+            android:cacheColorHint="#7FFF00"
+            android:layout_below="@+id/TextView01"></ListView>
 
-</RelativeLayout>
+    </RelativeLayout>
 
 </LinearLayout>

@@ -2,9 +2,17 @@ package orz.kassy.dts.twitter;
 
 import orz.kassy.dts.image.ImageCache;
 import com.kyocera.dualscreen.DualScreen;
+
+import twitter4j.AsyncTwitter;
+import twitter4j.AsyncTwitterFactory;
+import twitter4j.ResponseList;
+import twitter4j.Status;
 import twitter4j.Twitter;
+import twitter4j.TwitterAdapter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
+import twitter4j.TwitterListener;
+import twitter4j.TwitterMethod;
 import twitter4j.http.AccessToken;
 import twitter4j.http.RequestToken;
 import android.app.Activity;
@@ -81,7 +89,9 @@ public class MainActivity extends Activity implements OnClickListener {
 			// TimeLineをListViewに表示
 			try {
 				mAdapter = new StatusAdapter(MainActivity.this, mTwitter.getHomeTimeline());
-				mDialog.dismiss();
+				if(mDialog!=null) {
+				    mDialog.dismiss();
+				}
 			} catch(TwitterException e) {
 				
 			}
@@ -108,9 +118,49 @@ public class MainActivity extends Activity implements OnClickListener {
 
         // 認証してない場合だけ認証処理するよ
         if(mAccessToken == null) {
+            // 認証処理（非同期）
             mTask = new AuthAsyncTask(this);
             mTask.execute(0);
+        // 認証してる時はいきなりタイムライン流すよ
+        } else {
+            // 非同期にタイムラインの取得処理するよ
+            getAsyncTimeLine();
         }
+    }
+
+    private void getAsyncTimeLine() {
+        
+        // 前処理　ダイアログ 表示
+        mDialog = new ProgressDialog(this);
+        mDialog.setMessage("Gyudon tweet");
+        mDialog.setIndeterminate(true);
+        mDialog.show();
+
+        // 後処理 ダイアログ消去とか　実はこれワーカースレッドぽい... 
+        TwitterListener listener = new TwitterAdapter() {
+            @Override
+            public void gotHomeTimeline(ResponseList<Status> statuses) {
+                mDialog.dismiss();  
+                mAdapter = new StatusAdapter(MainActivity.this, statuses);
+                mHandler.post(new Runnable(){
+                    @Override
+                    public void run() {
+                        setScreenLayout();                   
+                    }
+                });
+            }
+            @Override
+            public void onException(TwitterException ex, TwitterMethod method) {
+                mDialog.dismiss();
+            }
+        };
+        
+        //mAccessToken = AppUtils.loadAccessToken(this);
+        AsyncTwitterFactory factory = new AsyncTwitterFactory(listener);
+        AsyncTwitter asyncTwitter = factory.getInstance();
+        asyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
+        asyncTwitter.setOAuthAccessToken(mAccessToken);
+        asyncTwitter.getHomeTimeline();
     }
     
 	@Override
@@ -184,6 +234,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	/**
 	 *  Echo のスタイルが変化するたびに呼ばれる。
 	 *  表示変化等の処理を行う　
+	 *  UIスレッドで呼ぶこと
 	 */
     private void setScreenLayout() {
         

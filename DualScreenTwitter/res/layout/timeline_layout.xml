@@ -2,25 +2,31 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-<ImageView
-    android:layout_width="wrap_content"
-    android:layout_alignParentLeft="true"
-    android:layout_height="wrap_content"
-    android:id="@+id/img_icon"></ImageView>
+    android:layout_height="fill_parent"
+    android:padding="5dip"
+    >
+    <ImageView
+        android:layout_width="50dip"
+        android:layout_alignParentLeft="true"
+        android:layout_height="50dip"
+        android:id="@+id/img_icon"></ImageView>
     <TextView
-        android:text="@+id/TextView01"
+        android:text="aaaa"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/lbl_screenname"
-        android:textSize="20dip"
+        android:textSize="14dip"
+        android:textStyle="bold"
+        android:layout_alignTop="@id/img_icon"
+        android:layout_marginLeft="5dip"
         android:layout_toRightOf="@+id/img_icon"></TextView>
     <TextView
-        android:text="@+id/TextView02"
+        android:text="bbbb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/TextView01"
         android:id="@+id/lbl_tweet"
+        android:textSize="14dip"
+        android:layout_marginLeft="5dip"
         android:layout_toRightOf="@+id/img_icon"
         android:layout_below="@+id/lbl_screenname"></TextView>
 </RelativeLayout>
