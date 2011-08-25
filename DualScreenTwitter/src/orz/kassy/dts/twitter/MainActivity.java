@@ -246,9 +246,15 @@ public class MainActivity extends Activity implements OnClickListener {
         int height = display.getHeight();
 
         if( screen_mode == DualScreen.FULL ) {
+            // full tate (D|D)
             if( width > height ) {
-                //full tate 
                 setContentView(R.layout.main_full_tate);
+
+                // キーボードを隠す
+                if(mListView1 != null){
+                    InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);  
+                    inputMethodManager.hideSoftInputFromWindow(mListView1.getWindowToken(), 0);                  //full tate 
+                }
                 //Utils.showToast(this, "tate");
                 if(mAdapter != null) {
                     mListView1 = (ListView) findViewById(R.id.listview1);
