@@ -51,6 +51,14 @@ public class Utils {
 		return ipStr;
 	}
 	
+	/**
+	 * シンプルアラートダイアログ出すよ 
+	 * @param con
+	 * @param title
+	 * @param message
+	 * @param okListener
+	 * @param cancelListener
+	 */
 	public static void showSimpleAlertDialog(Context con, 
 	                                            String title, 
 	                                            String message, 
@@ -74,12 +82,22 @@ public class Utils {
         alertDialog.show();	    
 	}
 
+	/**
+	 * IPアドレスを取得するよ　整数型で
+	 * @param con
+	 * @return
+	 */
 	public static int geIntAddress(Context con){
 		WifiManager wfm = (WifiManager)con.getSystemService(Context.WIFI_SERVICE);
 		int ip = wfm.getConnectionInfo().getIpAddress();
 		return ip;
 	}
 	
+	/**
+	 * トーストを表示するよ
+	 * @param con　コンテキスト
+	 * @param message　メッセージ
+	 */
 	public static void showToast(Context con, String message){
 	    Toast.makeText(con, message, Toast.LENGTH_LONG).show();
 	}

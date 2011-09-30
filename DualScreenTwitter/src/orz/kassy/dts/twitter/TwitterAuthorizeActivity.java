@@ -26,11 +26,13 @@ public class TwitterAuthorizeActivity extends Activity implements OnClickListene
 		btn.setOnClickListener(this);
 		
 		Bundle extras = getIntent().getExtras();
+		// 認証用ページのURLを読みだすよ
 		if(extras != null) {
 			if(extras.containsKey("authurl")) {
 				strUrl = extras.getString("authurl");
 			}
 		} else {
+		    Utils.showToast(this, "認証失敗しました... ");
 			finish();
 		}
 		WebView webview = (WebView)findViewById(R.id.webview);
@@ -53,7 +55,5 @@ public class TwitterAuthorizeActivity extends Activity implements OnClickListene
 			}
 			break;
 		}
-		
 	}
-	
 }

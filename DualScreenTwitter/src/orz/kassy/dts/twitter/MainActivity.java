@@ -39,6 +39,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 import orz.kassy.dts.twitter.R;
 
+/**
+ * メインアクティビティー
+ * @author kashimoto
+ */
 public class MainActivity extends Activity implements OnClickListener {
     
     private static final String INTENT_ACTION_SLIDE = "com.kyocera.intent.action.SLIDE_OPEN";
@@ -108,6 +112,7 @@ public class MainActivity extends Activity implements OnClickListener {
         DualScreen.restrictOrientationAtFullScreen( this, ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED );
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         setScreenLayout();
+        
         // Register intent receiver.
         mReceiver = new CustomReceiver();
         IntentFilter slideFilter = new IntentFilter(INTENT_ACTION_SLIDE);
@@ -127,6 +132,20 @@ public class MainActivity extends Activity implements OnClickListener {
             getAsyncTimeLine();
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setScreenLayout();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(mTwitter != null) mTwitter.shutdown();
+        ImageCache.clear();
+    }
+
 
     private void getAsyncTimeLine() {
         
@@ -163,15 +182,10 @@ public class MainActivity extends Activity implements OnClickListener {
         asyncTwitter.getHomeTimeline();
     }
     
-	@Override
-	protected void onStop() {
-		super.onStop();
-		
-		if(mTwitter != null) mTwitter.shutdown();
-		
-		ImageCache.clear();
-	}
 
+	/**
+	 * 端末の向きが変わった時
+	 */
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
         Log.i(TAG,"onConfigurationChange");
@@ -180,7 +194,9 @@ public class MainActivity extends Activity implements OnClickListener {
     }
 
 	
-	// 認証処理から帰ってきたとき
+	/**
+	 *  認証処理から帰ってきたとき
+	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -200,8 +216,8 @@ public class MainActivity extends Activity implements OnClickListener {
 					public void run() {
 						try {
 						    // 認証が成功したあとの処理
+						    // アクセストークン取得
 							mAccessToken = mTwitter.getOAuthAccessToken(mToken, pincode);
-
 							// Preferenceに保存
                             // 本番モードのみ
                             AppUtils.saveAccessToken(self, mAccessToken);
@@ -225,11 +241,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	}
 	
-	@Override
-	protected void onResume() {
-	    super.onResume();
-	    setScreenLayout();
-	}
 
 	/**
 	 *  Echo のスタイルが変化するたびに呼ばれる。
@@ -313,7 +324,6 @@ public class MainActivity extends Activity implements OnClickListener {
     }
     
     DialogInterface.OnClickListener oklistener = new DialogInterface.OnClickListener(){
-
         @Override
         public void onClick(DialogInterface arg0, int arg1) {
             setScreenLayout();
@@ -333,7 +343,9 @@ public class MainActivity extends Activity implements OnClickListener {
             mActivity = activity;
         }
 
-        // 前処理 これはUIスレッドでの処理ね
+        /**
+         *  前処理 これはUIスレッドでの処理ね
+         */
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -347,7 +359,9 @@ public class MainActivity extends Activity implements OnClickListener {
             mDialog.show();
         }
         
-        // ワーカースレッドでの処理ね
+        /**
+         *  これはワーカースレッドでの処理ね
+         */
         @Override
         protected Integer doInBackground(Integer... arg0) {
 
@@ -359,7 +373,7 @@ public class MainActivity extends Activity implements OnClickListener {
             
             // accesstoken がない場合（認証まだな場合）
             if(mAccessToken == null) {
-                // 初回の認証処理
+                // 初回のアプリ認証処理
                 mTwitter = new TwitterFactory().getInstance();
                 mTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
                 try {
@@ -370,29 +384,35 @@ public class MainActivity extends Activity implements OnClickListener {
                     e.printStackTrace();
                     return RESULT_NG;
                 }
-
-            
             // すでに認証できてる場合
             } else {
                 return RESULT_AUTHED;
             }
         }
 
-        // 後処理 これはUIスレッドでの処理ね
+        /**
+         *  後処理 これはUIスレッドでの処理ね
+         */
         @Override
         protected void onPostExecute (Integer result) {
             super.onPostExecute(result);
+            // 初回アプリ認証処理が成功した場合ね
             if(result == RESULT_OK) {
+                // ダイアログ消して
                 if(mDialog != null) {
                     mDialog.dismiss();
                 }
+                // ユーザー認証画面に遷移するよ
+                // インテントには認証用URLの情報を入れとくよ
                 Intent intent = new Intent(mActivity, TwitterAuthorizeActivity.class);
                 intent.putExtra(AppUtils.AUTH_URL, mAuthorizeUrl);
                 mActivity.startActivityForResult(intent, TWITTER_AUTHORIZE);
+            // 初回アプリ認証失敗した場合
             } else if(result == RESULT_NG) {
                 if(mDialog != null) {
                     mDialog.dismiss();
                 }
+                // トーストだけだしてゴメンナサイ
                 Toast.makeText(mActivity, R.string.twitter_auth_error, Toast.LENGTH_SHORT).show();
             }
         }
