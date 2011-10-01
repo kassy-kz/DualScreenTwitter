@@ -87,20 +87,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	};
 	
-	private Runnable mRunnable_List_update = new Runnable() {
-		@Override
-		public void run() {
-			// TimeLineをListViewに表示
-			try {
-				mAdapter = new StatusAdapter(MainActivity.this, mTwitter.getHomeTimeline());
-				if(mDialog!=null) {
-				    mDialog.dismiss();
-				}
-			} catch(TwitterException e) {
-				
-			}
-		}
-	};
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -146,7 +132,9 @@ public class MainActivity extends Activity implements OnClickListener {
         ImageCache.clear();
     }
 
-
+    /**
+     * タイムラインの取得（公式AsyncTwitter）
+     */
     private void getAsyncTimeLine() {
         
         // 前処理　ダイアログ 表示
@@ -241,6 +229,22 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	}
 	
+	/**
+	 * 認証処理の後処理　TwitterタイムラインをListViewに表示するよ
+	 */
+	private Runnable mRunnable_List_update = new Runnable() {
+	    @Override
+	    public void run() {
+	        // TimeLineをListViewに表示
+	        try {
+	            mAdapter = new StatusAdapter(MainActivity.this, mTwitter.getHomeTimeline());
+	            if(mDialog!=null) {
+	                mDialog.dismiss();
+	            }
+	        } catch(TwitterException e) {
+	        }
+	    }
+	};
 
 	/**
 	 *  Echo のスタイルが変化するたびに呼ばれる。
@@ -299,8 +303,10 @@ public class MainActivity extends Activity implements OnClickListener {
         }
     }
 	
+    /**
+     * 端末状態変化した時のブロードキャストレシーバー
+     */
     class CustomReceiver extends BroadcastReceiver {
-
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if ( action.equals(INTENT_ACTION_SLIDE)) {
@@ -412,7 +418,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 if(mDialog != null) {
                     mDialog.dismiss();
                 }
-                // トーストだけだしてゴメンナサイ
+                // トーストだけだしてゴメンナサイ「認証に失敗しました」
                 Toast.makeText(mActivity, R.string.twitter_auth_error, Toast.LENGTH_SHORT).show();
             }
         }

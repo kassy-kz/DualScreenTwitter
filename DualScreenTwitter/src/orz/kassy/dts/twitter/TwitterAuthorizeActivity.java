@@ -10,7 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import orz.kassy.dts.twitter.R;
     
-    
+/**
+ * Twitter で OAuthするためのアクティビティね（WebViewがでるの）    
+ * @author kashimoto
+ */
 public class TwitterAuthorizeActivity extends Activity implements OnClickListener {
 
 	@Override

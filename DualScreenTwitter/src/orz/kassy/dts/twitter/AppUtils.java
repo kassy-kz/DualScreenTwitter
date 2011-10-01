@@ -6,9 +6,14 @@ import android.content.SharedPreferences.Editor;
 import twitter4j.http.AccessToken;
 
 public class AppUtils {
+    
     public static final String PREF_FILE_NAME = "pref_file";
-    public static final String CONSUMER_KEY = "0puDNPmm5z6ZKtIGwjzgow";
-    public static final String CONSUMER_SECRET = "CZQ4abCLZpkOJ1QjFTRl9bcez8Y8PqazgLnqIwfNtw";
+    public static final String CONSUMER_KEY = "IfHeDiZaU5APV4MLxfA";
+    public static final String CONSUMER_SECRET = "y4GC9SSsTttftO42hMmv7XZnmiCNZoJLxT6855klI";
+    public static final String REQUEST_TOKEN_URL = "https://api.twitter.com/oauth/request_token";
+    public static final String AUTHORIZE_URL = "https://api.twitter.com/oauth/authorize";
+    public static final String ACCESS_TOKEN_URL = "https://api.twitter.com/oauth/access_token";
+    
     public static final String ACCESS_TOKEN = "access_token";
     public static final String ACCESS_TOKEN_SECRET = "access_token_secret";
     public static final String AUTH_URL = "authurl";

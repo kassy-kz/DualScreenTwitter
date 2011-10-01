@@ -19,20 +19,20 @@ public class HttpServerIF {
 	public static final int UNKNOWN_HOST = -1;
 	private static final String LOG_TAG = "HttpServerIF";
 	
-	private Bitmap resBitmap;
-	private String resText;
+	private Bitmap mResultBitmap;
+	private String mResultText;
 	
 	public Bitmap getResBitmap() {
-		return resBitmap;
+		return mResultBitmap;
 	}
 	
 	public String getResText() {
-		return resText;
+		return mResultText;
 	}
 	
 	public int requestText(String url) {
 		int iRet = UNKNOWN_HOST;
-		resText = "";								// メンバ変数の内容を初期化する。
+		mResultText = "";								// メンバ変数の内容を初期化する。
 
 		log(url);
 		
@@ -49,7 +49,7 @@ public class HttpServerIF {
 				if(iRet == HttpStatus.SC_OK) {
 					// リクエスト成功。レスポンスを取得
 					entity = res.getEntity();
-					resText = EntityUtils.toString(entity);
+					mResultText = EntityUtils.toString(entity);
 				}
 			}
 		} catch(UnknownHostException uhe) {
@@ -71,9 +71,14 @@ public class HttpServerIF {
 		return iRet;
 	}
 	
+	/**
+	 * 画像をサーバーから取得してmResultBitmapに格納
+	 * @param url  URL
+	 * @return Http Result
+	 */
 	public int requestImage(String url) {
 		int iRet = UNKNOWN_HOST;
-		resBitmap = null;							// メンバ変数の内容を初期化する。
+		mResultBitmap = null;							// メンバ変数の内容を初期化する。
 		log(url);
 		
 		// 引数に記述されたURLに対してGET METHODでのリクエストを送信する。
@@ -92,7 +97,7 @@ public class HttpServerIF {
 						Bitmap bmp = BitmapFactory.decodeStream(res.getEntity().getContent());
 						if(bmp != null) {
 							// 受信後にメンバ変数に退避
-							resBitmap = bmp;
+							mResultBitmap = bmp;
 						}
 					} catch(IOException ie) {
 						log(ie);

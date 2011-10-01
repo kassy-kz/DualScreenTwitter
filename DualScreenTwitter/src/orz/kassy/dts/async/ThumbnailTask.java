@@ -18,6 +18,10 @@ public class ThumbnailTask extends AsyncTask<String, Void, Integer> {
 		mImage = image;
 	}
 	
+	/**
+	 * ワーカースレッドの処理
+	 * 引数：　params URL, key
+	 */
 	@Override
 	protected Integer doInBackground(String... params) {
 		String url = params[0];
@@ -35,6 +39,9 @@ public class ThumbnailTask extends AsyncTask<String, Void, Integer> {
 		return new Integer(iRet);
 	}
 
+    /**
+     * 後処理　（UIスレッド）
+     */
 	@Override
 	protected void onPostExecute(Integer result) {
 		super.onPostExecute(result);
