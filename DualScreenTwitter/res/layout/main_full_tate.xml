@@ -8,44 +8,29 @@
     <LinearLayout
         android:id="@+id/LayoutSecondaryScreen"
         android:orientation="vertical"
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_width="0px"
         android:layout_weight="1">
-        <TextView
-            android:id="@+id/TextView01"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:gravity="center"
-            android:text="Home Timeline"
-            android:textSize="12dip"></TextView>
-        <ListView
-            android:id="@+id/listview1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/TextView01"></ListView>
+
+        <fragment
+            class="orz.kassy.dts.twitter.TimeLineListFragment"
+            android:id="@+id/timelineFragmentL"
+            android:layout_width ="fill_parent"
+            android:layout_height="fill_parent" />
     </LinearLayout>
 
-    <RelativeLayout
-        android:id="@+id/LayoutPrimaryScreen"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/LayoutSecondaryScreen"
+        android:orientation="vertical"
         android:layout_height="match_parent"
-        android:background="#7FFF00"
+        android:layout_width="0px"
         android:layout_weight="1">
-        <TextView
-            android:id="@+id/TextView01"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:gravity="center"
-            android:text="Your Friend List"
-            android:textSize="12dip"></TextView>
-        <ListView
-            android:id="@+id/listview2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#7FFF00"
-            android:cacheColorHint="#7FFF00"
-            android:layout_below="@+id/TextView01"></ListView>
 
-    </RelativeLayout>
+        <fragment
+            class="orz.kassy.dts.twitter.TimeLineListFragment"
+            android:id="@+id/timelineFragmentR"
+            android:layout_width ="fill_parent"
+            android:layout_height="fill_parent" />
+    </LinearLayout>
 
 </LinearLayout>

@@ -1,6 +1,7 @@
 package orz.kassy.dts.twitter;
 
 import orz.kassy.dts.image.ImageCache;
+
 import com.kyocera.dualscreen.DualScreen;
 
 import twitter4j.AsyncTwitter;
@@ -28,22 +29,27 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 import orz.kassy.dts.twitter.R;
+import orz.kassy.dts.twitter.AppUtils;
 
 /**
  * メインアクティビティー
  * @author kashimoto
  */
-public class MainActivity extends Activity implements OnClickListener {
+public class MainActivity extends FragmentActivity 
+                          implements OnClickListener, TimeLineListFragment.OnTimeLineListItemClickListener {
     
     private static final String INTENT_ACTION_SLIDE = "com.kyocera.intent.action.SLIDE_OPEN";
     CustomReceiver mReceiver;
@@ -68,31 +74,11 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private AuthAsyncTask mTask;
 
-	// Receive thread
-	private Runnable mRunnable_normal = new Runnable() {
-	    @Override
-		public void run() {
-			mDialog.dismiss();
-			Intent intent = new Intent(MainActivity.this, TwitterAuthorizeActivity.class);
-			intent.putExtra("authurl", mAuthorizeUrl);
-			startActivityForResult(intent, TWITTER_AUTHORIZE);
-		}
-	};
-
-	private Runnable mRunnable_error = new Runnable() {
-		@Override
-		public void run() {
-			mDialog.dismiss();
-			Toast.makeText(MainActivity.this, R.string.twitter_auth_error, Toast.LENGTH_SHORT).show();
-		}
-	};
-	
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         self = this;
-        setContentView(R.layout.main);        
+        //setContentView(R.layout.main);        
 
         // Echo DTS Setting 
         DualScreen.restrictOrientationAtFullScreen( this, ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED );
@@ -112,17 +98,28 @@ public class MainActivity extends Activity implements OnClickListener {
             // 認証処理（非同期）
             mTask = new AuthAsyncTask(this);
             mTask.execute(0);
-        // 認証してる時はいきなりタイムライン流すよ
+        // 認証してる時はいきなりタイムライン流すよ あ、でも縦のときだけね
         } else {
-            // 非同期にタイムラインの取得処理するよ
-            getAsyncTimeLine();
+            if(AppUtils.isEchoTate(self)) {
+                // 非同期にタイムラインの取得処理するよ
+                FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
+                TimeLineListFragment timelineFragmentL = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentL);
+                timelineFragmentL.updateTimeLine(mAccessToken);
+                TimeLineListFragment timelineFragmentR = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
+                timelineFragmentR.updateTimeLine(mAccessToken);
+            }
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        setScreenLayout();
+        //setScreenLayout();
+        // キーボード出すよ（横のときだけ）
+        if(AppUtils.isEchoYoko(self)) {
+            // 入力状態にする（キーボードを出現させる）
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
     }
 
     @Override
@@ -131,45 +128,6 @@ public class MainActivity extends Activity implements OnClickListener {
         if(mTwitter != null) mTwitter.shutdown();
         ImageCache.clear();
     }
-
-    /**
-     * タイムラインの取得（公式AsyncTwitter）
-     */
-    private void getAsyncTimeLine() {
-        
-        // 前処理　ダイアログ 表示
-        mDialog = new ProgressDialog(this);
-        mDialog.setMessage("Gyudon tweet");
-        mDialog.setIndeterminate(true);
-        mDialog.show();
-
-        // 後処理 ダイアログ消去とか　実はこれワーカースレッドぽい... 
-        TwitterListener listener = new TwitterAdapter() {
-            @Override
-            public void gotHomeTimeline(ResponseList<Status> statuses) {
-                mDialog.dismiss();  
-                mAdapter = new StatusAdapter(MainActivity.this, statuses);
-                mHandler.post(new Runnable(){
-                    @Override
-                    public void run() {
-                        setScreenLayout();                   
-                    }
-                });
-            }
-            @Override
-            public void onException(TwitterException ex, TwitterMethod method) {
-                mDialog.dismiss();
-            }
-        };
-        
-        //mAccessToken = AppUtils.loadAccessToken(this);
-        AsyncTwitterFactory factory = new AsyncTwitterFactory(listener);
-        AsyncTwitter asyncTwitter = factory.getInstance();
-        asyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
-        asyncTwitter.setOAuthAccessToken(mAccessToken);
-        asyncTwitter.getHomeTimeline();
-    }
-    
 
 	/**
 	 * 端末の向きが変わった時
@@ -181,9 +139,8 @@ public class MainActivity extends Activity implements OnClickListener {
         setScreenLayout();
     }
 
-	
 	/**
-	 *  認証処理から帰ってきたとき
+	 *  認証処理(WebView)から帰ってきたとき
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -235,20 +192,16 @@ public class MainActivity extends Activity implements OnClickListener {
 	private Runnable mRunnable_List_update = new Runnable() {
 	    @Override
 	    public void run() {
-	        // TimeLineをListViewに表示
-	        try {
-	            mAdapter = new StatusAdapter(MainActivity.this, mTwitter.getHomeTimeline());
-	            if(mDialog!=null) {
-	                mDialog.dismiss();
-	            }
-	        } catch(TwitterException e) {
-	        }
+            FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
+            TimeLineListFragment timelineFragment = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
+            timelineFragment.updateTimeLine(mAccessToken);
 	    }
 	};
+    static private int tmpCnt;
 
 	/**
 	 *  Echo のスタイルが変化するたびに呼ばれる。
-	 *  表示変化等の処理を行う　
+	 *  表示変化等の処理を行う　(setContentViewを呼ぶ)
 	 *  UIスレッドで呼ぶこと
 	 */
     private void setScreenLayout() {
@@ -263,19 +216,15 @@ public class MainActivity extends Activity implements OnClickListener {
         if( screen_mode == DualScreen.FULL ) {
             // full tate (D|D)
             if( width > height ) {
-                setContentView(R.layout.main_full_tate);
+//                if(tmpCnt == 0){
+                    setContentView(R.layout.main_full_tate);
+//                    tmpCnt++;
+//                }
 
                 // キーボードを隠す
                 if(mListView1 != null){
                     InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);  
                     inputMethodManager.hideSoftInputFromWindow(mListView1.getWindowToken(), 0);                  //full tate 
-                }
-                //Utils.showToast(this, "tate");
-                if(mAdapter != null) {
-                    mListView1 = (ListView) findViewById(R.id.listview1);
-                    mListView1.setAdapter(mAdapter);
-                    mListView2 = (ListView) findViewById(R.id.listview2);
-                    mListView2.setAdapter(mAdapter);
                 }
             } else {
                 //full yoko (Input style !!)
@@ -283,20 +232,15 @@ public class MainActivity extends Activity implements OnClickListener {
                 //Utils.showToast(this, "yoko");
                 Button btn = (Button)findViewById(R.id.btnsend);
                 btn.setOnClickListener(this);
-                EditText editText = (EditText)findViewById(R.id.editText1);
-                // 入力状態にする（キーボードを出現させる）
-                editText.requestFocus();
-                InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);  
-                inputMethodManager.showSoftInput(editText, 0);  
             }
         } else {
             // for normal screen
             if( width > height ) {
                 // normal yoko
-                setContentView(R.layout.main_normal_yoko);
+                setContentView(R.layout.main_half_yoko);
             } else {
                 // normal tate
-                setContentView(R.layout.main_normal_tate);
+                setContentView(R.layout.main_half_tate);
                 mListView1 = (ListView) findViewById(R.id.listview1);
                 mListView1.setAdapter(mAdapter);
             }
@@ -324,6 +268,12 @@ public class MainActivity extends Activity implements OnClickListener {
 
     @Override
     public void onClick(View v) {
+        // 入力状態にする（キーボードを出現させる）
+        EditText editText = (EditText)findViewById(R.id.editText1);
+        editText.requestFocus();
+        InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);  
+        inputMethodManager.showSoftInput(editText, 0);  
+
         if(v.getId()==R.id.btnsend){
             Utils.showSimpleAlertDialog(this,"Send","send completed",oklistener,oklistener);
         }
@@ -432,5 +382,11 @@ public class MainActivity extends Activity implements OnClickListener {
             public void onDismiss(DialogInterface dialog) {
             }
         };
+    }
+
+    @Override
+    public void onPhotoListItemClick(int resId) {
+        // TODO Auto-generated method stub
+        
     }
 }

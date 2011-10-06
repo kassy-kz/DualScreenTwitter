@@ -8,6 +8,7 @@ import twitter4j.TwitterAdapter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterListener;
 import twitter4j.TwitterMethod;
+import twitter4j.http.AccessToken;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -23,13 +24,33 @@ import android.widget.ListView;
  * @author kashimoto
  */
 public class TimeLineListFragment extends ListFragment{
+    
     private OnTimeLineListItemClickListener mListener;
     private StatusAdapter mAdapter = null;
     private Handler mHandler = new Handler();
+    private AccessToken mAccessToken = null;
 
+    /**
+     * リストをクリックした時の処理、　なにするかは決めてない 
+     * @author kashimoto
+     */
+    public interface OnTimeLineListItemClickListener {
+        void onPhotoListItemClick(int resId);
+    }
+    
+    /**
+     * このフラグメント内のリストビューを更新しますよ 
+     */
+    public void updateTimeLine(AccessToken accessToken) {
+        mAccessToken = accessToken;
+        getAsyncTimeLine();
+    }
+    
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+//        Photo[] photos = PhotoManager.getPhotos();
+//        setListAdapter(new ArrayAdapter<Photo>(getActivity(), android.R.layout.simple_list_item_1, photos));
 
     }
 
@@ -49,9 +70,6 @@ public class TimeLineListFragment extends ListFragment{
     public void onListItemClick(ListView l, View v, int position, long id) {
     }
 
-    public interface OnTimeLineListItemClickListener {
-        void onPhotoListItemClick(int resId);
-    }
     
     /**
      * タイムラインの取得（公式AsyncTwitter）
@@ -81,7 +99,7 @@ public class TimeLineListFragment extends ListFragment{
         AsyncTwitterFactory factory = new AsyncTwitterFactory(listener);
         AsyncTwitter asyncTwitter = factory.getInstance();
         asyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
-       // asyncTwitter.setOAuthAccessToken(mAccessToken);
+        asyncTwitter.setOAuthAccessToken(mAccessToken);
         asyncTwitter.getHomeTimeline();
     }
 
