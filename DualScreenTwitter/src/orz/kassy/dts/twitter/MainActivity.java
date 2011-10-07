@@ -43,6 +43,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import orz.kassy.dts.twitter.R;
 import orz.kassy.dts.twitter.AppUtils;
+import orz.kassy.dts.twitter.color.ColorThemeGreen;
 
 /**
  * メインアクティビティー
@@ -62,7 +63,7 @@ public class MainActivity extends FragmentActivity
 	private RequestToken mToken = null;
 	
 	private AccessToken mAccessToken = null;
-	private StatusAdapter mAdapter = null;
+	private TweetStatusAdapter mAdapter = null;
 	private String mAuthorizeUrl = "";
 	
 	private ProgressDialog mDialog = null;
@@ -83,7 +84,6 @@ public class MainActivity extends FragmentActivity
         // Echo DTS Setting 
         DualScreen.restrictOrientationAtFullScreen( this, ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED );
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-        setScreenLayout();
         
         // Register intent receiver.
         mReceiver = new CustomReceiver();
@@ -100,14 +100,16 @@ public class MainActivity extends FragmentActivity
             mTask.execute(0);
         // 認証してる時はいきなりタイムライン流すよ あ、でも縦のときだけね
         } else {
-            if(AppUtils.isEchoTate(self)) {
-                // 非同期にタイムラインの取得処理するよ
-                FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
-                TimeLineListFragment timelineFragmentL = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentL);
-                timelineFragmentL.updateTimeLine(mAccessToken);
-                TimeLineListFragment timelineFragmentR = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
-                timelineFragmentR.updateTimeLine(mAccessToken);
-            }
+//            if(AppUtils.isEchoTate(self)) {
+//                // 非同期にタイムラインの取得処理するよ
+//                FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
+//                TimeLineListFragment timelineFragmentL = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentL);
+//                timelineFragmentL.updateTimeLine(mAccessToken);
+//                TimeLineListFragment timelineFragmentR = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
+//                timelineFragmentR.updateTimeLine(mAccessToken);
+//            }
+            // 表示処理を行います
+            setScreenLayout();
         }
     }
 
@@ -187,21 +189,19 @@ public class MainActivity extends FragmentActivity
 	}
 	
 	/**
-	 * 認証処理の後処理　TwitterタイムラインをListViewに表示するよ
+	 * WebViewAuthの後の認証処理の後処理　TwitterタイムラインをListViewに表示するよ
 	 */
 	private Runnable mRunnable_List_update = new Runnable() {
 	    @Override
 	    public void run() {
-            FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
-            TimeLineListFragment timelineFragment = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
-            timelineFragment.updateTimeLine(mAccessToken);
+	        setScreenLayout();
 	    }
 	};
     static private int tmpCnt;
 
 	/**
 	 *  Echo のスタイルが変化するたびに呼ばれる。
-	 *  表示変化等の処理を行う　(setContentViewを呼ぶ)
+	 *  各形態に合わせた表示処理を行う　(setContentViewを呼ぶ)
 	 *  UIスレッドで呼ぶこと
 	 */
     private void setScreenLayout() {
@@ -216,18 +216,18 @@ public class MainActivity extends FragmentActivity
         if( screen_mode == DualScreen.FULL ) {
             // full tate (D|D)
             if( width > height ) {
-//                if(tmpCnt == 0){
-                    setContentView(R.layout.main_full_tate);
-//                    tmpCnt++;
-//                }
+                setContentView(R.layout.main_full_tate);
 
-                // キーボードを隠す
-                if(mListView1 != null){
-                    InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);  
-                    inputMethodManager.hideSoftInputFromWindow(mListView1.getWindowToken(), 0);                  //full tate 
-                }
+                // 左右のフラグメントでタイムライン更新だぜ
+                FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
+                TimeLineListFragment timelineFragmentL = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentL);
+                timelineFragmentL.updateHomeTimeLine(mAccessToken);
+                TimeLineListFragment timelineFragmentR = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
+                timelineFragmentR.updateMentions(mAccessToken);
+                timelineFragmentR.setColorTheme(new ColorThemeGreen());
+                
             } else {
-                //full yoko (Input style !!)
+                //full yoko (＝)
                 setContentView(R.layout.main_full_yoko);
                 //Utils.showToast(this, "yoko");
                 Button btn = (Button)findViewById(R.id.btnsend);
@@ -241,8 +241,9 @@ public class MainActivity extends FragmentActivity
             } else {
                 // normal tate
                 setContentView(R.layout.main_half_tate);
-                mListView1 = (ListView) findViewById(R.id.listview1);
-                mListView1.setAdapter(mAdapter);
+                FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
+                TimeLineListFragment timelineFragmentHalf = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentHalf);
+                timelineFragmentHalf.updateHomeTimeLine(mAccessToken);
             }
         }
     }
@@ -288,6 +289,8 @@ public class MainActivity extends FragmentActivity
     
     /**
      * 認証処理の非同期タスク
+     * ワーカースレッドでアクセス初回認証処理（トークン取得とか）やります
+     * 後処理でWebViewのあるAuthページに飛んで認証処理に入ります
      */
     public class AuthAsyncTask extends AsyncTask<Integer, Void, Integer>{
         private Activity mActivity;
@@ -358,7 +361,7 @@ public class MainActivity extends FragmentActivity
                 if(mDialog != null) {
                     mDialog.dismiss();
                 }
-                // ユーザー認証画面に遷移するよ
+                // ユーザー認証画面(WebView)に遷移するよ
                 // インテントには認証用URLの情報を入れとくよ
                 Intent intent = new Intent(mActivity, TwitterAuthorizeActivity.class);
                 intent.putExtra(AppUtils.AUTH_URL, mAuthorizeUrl);

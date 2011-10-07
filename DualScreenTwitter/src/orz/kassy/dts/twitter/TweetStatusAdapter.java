@@ -5,6 +5,8 @@ import java.util.List;
 import orz.kassy.dts.async.ThumbnailTask;
 import orz.kassy.dts.image.ImageCache;
 import orz.kassy.dts.twitter.R;
+import orz.kassy.dts.twitter.color.ColorTheme;
+import orz.kassy.dts.twitter.color.ColorThemeWhite;
 import twitter4j.Status;
 
 import android.content.Context;
@@ -16,18 +18,32 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class StatusAdapter extends ArrayAdapter<Status> {
+public class TweetStatusAdapter extends ArrayAdapter<Status> {
 	private LayoutInflater inflater;
+	private ColorTheme mColorTheme = new ColorThemeWhite();
 	
-	public StatusAdapter(Context context, List<Status> objects) {
+	/**
+	 * コンストラクタ
+	 */
+	public TweetStatusAdapter(Context context, List<Status> objects) {
 		this(context, 0, objects);
 	}
 	
-	public StatusAdapter(Context context, int textViewResourceId, List<Status> objects) {
+	/**
+	 * コンストラクタ
+	 */
+	public TweetStatusAdapter(Context context, int textViewResourceId, List<Status> objects) {
 		super(context, textViewResourceId, objects);
 		inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 
+	/**
+	 * カラーの設定
+	 */
+	public void setColorTheme(ColorTheme colorTheme) {
+	    mColorTheme = colorTheme;
+	}
+	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder = null;
@@ -43,6 +59,11 @@ public class StatusAdapter extends ArrayAdapter<Status> {
 		} else {
 			holder = (ViewHolder)convertView.getTag();
 		}
+
+		// 色の設定だ
+		holder.lbl_screenname.setTextColor(mColorTheme.getTextColor());
+        //holder.lbl_name.setTextColor(mColorTheme.getTextColor());
+        holder.lbl_tweet.setTextColor(mColorTheme.getTextColor());
 		
 		Status status = this.getItem(position);
 		if(status != null) {

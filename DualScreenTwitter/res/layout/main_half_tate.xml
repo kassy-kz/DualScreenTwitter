@@ -3,16 +3,9 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
-    <TextView
-        android:id="@+id/TextView01"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:text="Your TimeLine"
-        android:textSize="18sp"></TextView>
-    <ListView
-        android:id="@+id/listview1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/TextView01"></ListView>
+    <fragment
+        class="orz.kassy.dts.twitter.TimeLineListFragment"
+        android:id="@+id/timelineFragmentHalf"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
 </LinearLayout>

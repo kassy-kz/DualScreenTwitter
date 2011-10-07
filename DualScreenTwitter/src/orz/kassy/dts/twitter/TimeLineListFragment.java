@@ -1,5 +1,7 @@
 package orz.kassy.dts.twitter;
 
+import orz.kassy.dts.twitter.color.ColorTheme;
+import orz.kassy.dts.twitter.color.ColorThemeWhite;
 import twitter4j.AsyncTwitter;
 import twitter4j.AsyncTwitterFactory;
 import twitter4j.ResponseList;
@@ -26,9 +28,10 @@ import android.widget.ListView;
 public class TimeLineListFragment extends ListFragment{
     
     private OnTimeLineListItemClickListener mListener;
-    private StatusAdapter mAdapter = null;
+    private TweetStatusAdapter mAdapter = null;
     private Handler mHandler = new Handler();
     private AccessToken mAccessToken = null;
+    private ColorTheme mColorTheme = new ColorThemeWhite();
 
     /**
      * リストをクリックした時の処理、　なにするかは決めてない 
@@ -39,19 +42,36 @@ public class TimeLineListFragment extends ListFragment{
     }
     
     /**
-     * このフラグメント内のリストビューを更新しますよ 
+     * このフラグメント内のリストビューをメインタイムラインで更新しますよ 
      */
-    public void updateTimeLine(AccessToken accessToken) {
+    public void updateHomeTimeLine(AccessToken accessToken) {
         mAccessToken = accessToken;
-        getAsyncTimeLine();
+        getAsyncHomeTimeLine();
+    }
+    
+    /**
+     * このフラグメント内のリストビューをMentionsでラインで更新しますよ 
+     */
+    public void updateMentions(AccessToken accessToken) {
+        mAccessToken = accessToken;
+        getAsyncMentions();
+    }
+
+    /**
+     * カラー変更しますよ
+     */
+    public void setColorTheme(ColorTheme colorTheme){
+        mColorTheme  = colorTheme;
+        getListView().setBackgroundColor(colorTheme.getBackgroundColor());
+        if(mAdapter != null) {
+            mAdapter.setColorTheme(colorTheme);            
+        }
     }
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        Photo[] photos = PhotoManager.getPhotos();
-//        setListAdapter(new ArrayAdapter<Photo>(getActivity(), android.R.layout.simple_list_item_1, photos));
-
+        getListView().setScrollingCacheEnabled(false); 
     }
 
     @Override
@@ -74,7 +94,7 @@ public class TimeLineListFragment extends ListFragment{
     /**
      * タイムラインの取得（公式AsyncTwitter）
      */
-    private void getAsyncTimeLine() {
+    private void getAsyncHomeTimeLine() {
         
         // 前処理　ダイアログ 表示
 
@@ -82,7 +102,7 @@ public class TimeLineListFragment extends ListFragment{
         TwitterListener listener = new TwitterAdapter() {
             @Override
             public void gotHomeTimeline(ResponseList<Status> statuses) {
-                mAdapter = new StatusAdapter(getActivity(), statuses);
+                mAdapter = new TweetStatusAdapter(getActivity(), statuses);
                 mHandler.post(new Runnable(){
                     @Override
                     public void run() {
@@ -103,5 +123,37 @@ public class TimeLineListFragment extends ListFragment{
         asyncTwitter.getHomeTimeline();
     }
 
+    /**
+     * Mentionラインの取得（公式AsyncTwitter）
+     */
+    private void getAsyncMentions() {
+        
+        // 前処理　ダイアログ 表示
+
+        // 後処理 ダイアログ消去とか　実はこれワーカースレッドぽい... ???
+        TwitterListener listener = new TwitterAdapter() {
+            @Override
+            public void gotMentions(ResponseList<Status> statuses) {
+                mAdapter = new TweetStatusAdapter(getActivity(), statuses);
+                mAdapter.setColorTheme(mColorTheme);
+                mHandler.post(new Runnable(){
+                    @Override
+                    public void run() {
+                        setListAdapter(mAdapter);                   
+                    }
+                });
+            }
+            @Override
+            public void onException(TwitterException ex, TwitterMethod method) {
+            }
+        };
+        
+        //mAccessToken = AppUtils.loadAccessToken(this);
+        AsyncTwitterFactory factory = new AsyncTwitterFactory(listener);
+        AsyncTwitter asyncTwitter = factory.getInstance();
+        asyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
+        asyncTwitter.setOAuthAccessToken(mAccessToken);
+        asyncTwitter.getMentions();
+    }
 
 }
