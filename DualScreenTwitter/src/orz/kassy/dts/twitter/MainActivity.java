@@ -33,6 +33,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -44,6 +46,7 @@ import android.widget.Toast;
 import orz.kassy.dts.twitter.R;
 import orz.kassy.dts.twitter.AppUtils;
 import orz.kassy.dts.twitter.color.ColorThemeGreen;
+import orz.kassy.dts.twitter.color.ColorThemeRed;
 
 /**
  * メインアクティビティー
@@ -75,6 +78,10 @@ public class MainActivity extends FragmentActivity
 
 	private AuthAsyncTask mTask;
 
+	private static final int MENU_ID_MENU1 = (Menu.FIRST + 1);
+    private static final int MENU_ID_MENU2 = (Menu.FIRST + 2);
+	
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,14 +107,6 @@ public class MainActivity extends FragmentActivity
             mTask.execute(0);
         // 認証してる時はいきなりタイムライン流すよ あ、でも縦のときだけね
         } else {
-//            if(AppUtils.isEchoTate(self)) {
-//                // 非同期にタイムラインの取得処理するよ
-//                FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
-//                TimeLineListFragment timelineFragmentL = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentL);
-//                timelineFragmentL.updateTimeLine(mAccessToken);
-//                TimeLineListFragment timelineFragmentR = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
-//                timelineFragmentR.updateTimeLine(mAccessToken);
-//            }
             // 表示処理を行います
             setScreenLayout();
         }
@@ -130,7 +129,52 @@ public class MainActivity extends FragmentActivity
         if(mTwitter != null) mTwitter.shutdown();
         ImageCache.clear();
     }
+    
+    /**
+     * オプションメニュー生成（最初の一度だけ）
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // メニューアイテムを追加します
+        getMenuInflater().inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    /**
+     *  オプションメニューが表示される度に呼び出されます
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
+    }
 
+    /**
+     *  オプションメニューアイテムが選択された時に呼び出されます
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        boolean ret = true;
+        switch (item.getItemId()) {
+        case R.id.create_new:
+            Log.i(TAG,"menu create new ");
+            FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
+            TimeLineListFragment timelineFragmentR = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
+            timelineFragmentR.setColorTheme(new ColorThemeRed());
+
+            
+            ret = true;
+            break;
+        case R.id.menu_id_tmp1:
+            Log.i(TAG,"menu tmp 1");
+            ret = true;
+            break;
+        default:
+            ret = super.onOptionsItemSelected(item);
+            break;
+        }
+        return ret;
+    }
+    
 	/**
 	 * 端末の向きが変わった時
 	 */

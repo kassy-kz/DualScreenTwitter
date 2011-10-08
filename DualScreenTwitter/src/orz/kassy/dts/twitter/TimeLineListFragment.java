@@ -10,6 +10,7 @@ import twitter4j.TwitterAdapter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterListener;
 import twitter4j.TwitterMethod;
+import twitter4j.conf.Configuration;
 import twitter4j.http.AccessToken;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -32,6 +33,7 @@ public class TimeLineListFragment extends ListFragment{
     private Handler mHandler = new Handler();
     private AccessToken mAccessToken = null;
     private ColorTheme mColorTheme = new ColorThemeWhite();
+    private AsyncTwitter mAsyncTwitter;
 
     /**
      * リストをクリックした時の処理、　なにするかは決めてない 
@@ -64,8 +66,10 @@ public class TimeLineListFragment extends ListFragment{
         mColorTheme  = colorTheme;
         getListView().setBackgroundColor(colorTheme.getBackgroundColor());
         if(mAdapter != null) {
-            mAdapter.setColorTheme(colorTheme);            
+            mAdapter.setColorTheme(colorTheme);
+            mAdapter.notifyDataSetChanged();
         }
+        
     }
     
     @Override
@@ -84,6 +88,11 @@ public class TimeLineListFragment extends ListFragment{
             throw new ClassCastException(activity.toString()
                     + " must implement OnPhotoListItemClickListener");
         }
+        
+        AsyncTwitterFactory factory = new AsyncTwitterFactory(mAsyncTwitterListener);
+        mAsyncTwitter = factory.getInstance();
+        mAsyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
+        mAsyncTwitter.setOAuthAccessToken(mAccessToken);
     }
 
     @Override
@@ -95,65 +104,47 @@ public class TimeLineListFragment extends ListFragment{
      * タイムラインの取得（公式AsyncTwitter）
      */
     private void getAsyncHomeTimeLine() {
-        
-        // 前処理　ダイアログ 表示
-
-        // 後処理 ダイアログ消去とか　実はこれワーカースレッドぽい... ???
-        TwitterListener listener = new TwitterAdapter() {
-            @Override
-            public void gotHomeTimeline(ResponseList<Status> statuses) {
-                mAdapter = new TweetStatusAdapter(getActivity(), statuses);
-                mHandler.post(new Runnable(){
-                    @Override
-                    public void run() {
-                        setListAdapter(mAdapter);                   
-                    }
-                });
-            }
-            @Override
-            public void onException(TwitterException ex, TwitterMethod method) {
-            }
-        };
-        
-        //mAccessToken = AppUtils.loadAccessToken(this);
-        AsyncTwitterFactory factory = new AsyncTwitterFactory(listener);
-        AsyncTwitter asyncTwitter = factory.getInstance();
-        asyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
-        asyncTwitter.setOAuthAccessToken(mAccessToken);
-        asyncTwitter.getHomeTimeline();
+        mAsyncTwitter.setOAuthAccessToken(mAccessToken);
+        mAsyncTwitter.getHomeTimeline();
     }
 
     /**
      * Mentionラインの取得（公式AsyncTwitter）
      */
     private void getAsyncMentions() {
-        
-        // 前処理　ダイアログ 表示
-
-        // 後処理 ダイアログ消去とか　実はこれワーカースレッドぽい... ???
-        TwitterListener listener = new TwitterAdapter() {
-            @Override
-            public void gotMentions(ResponseList<Status> statuses) {
-                mAdapter = new TweetStatusAdapter(getActivity(), statuses);
-                mAdapter.setColorTheme(mColorTheme);
-                mHandler.post(new Runnable(){
-                    @Override
-                    public void run() {
-                        setListAdapter(mAdapter);                   
-                    }
-                });
-            }
-            @Override
-            public void onException(TwitterException ex, TwitterMethod method) {
-            }
-        };
-        
-        //mAccessToken = AppUtils.loadAccessToken(this);
-        AsyncTwitterFactory factory = new AsyncTwitterFactory(listener);
-        AsyncTwitter asyncTwitter = factory.getInstance();
-        asyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
-        asyncTwitter.setOAuthAccessToken(mAccessToken);
-        asyncTwitter.getMentions();
+        mAsyncTwitter.setOAuthAccessToken(mAccessToken);
+        mAsyncTwitter.getMentions();
     }
+    
+    
+    
+    // 後処理 ダイアログ消去とか　実はこれワーカースレッドぽい... ???
+    TwitterListener mAsyncTwitterListener = new TwitterAdapter() {
+        @Override
+        public void gotHomeTimeline(ResponseList<Status> statuses) {
+            mAdapter = new TweetStatusAdapter(getActivity(), statuses);
+            mHandler.post(new Runnable(){
+                @Override
+                public void run() {
+                    setListAdapter(mAdapter);                   
+                }
+            });
+        }
+        
+        @Override
+        public void gotMentions(ResponseList<Status> statuses) {
+            mAdapter = new TweetStatusAdapter(getActivity(), statuses);
+            mAdapter.setColorTheme(mColorTheme);
+            mHandler.post(new Runnable(){
+                @Override
+                public void run() {
+                    setListAdapter(mAdapter);                   
+                }
+            });
+        }
 
+        @Override
+        public void onException(TwitterException ex, TwitterMethod method) {
+        }
+    };
 }
