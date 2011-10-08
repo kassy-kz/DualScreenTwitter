@@ -53,7 +53,7 @@ import orz.kassy.dts.twitter.color.ColorThemeRed;
  * @author kashimoto
  */
 public class MainActivity extends FragmentActivity 
-                          implements OnClickListener, TimeLineListFragment.OnTimeLineListItemClickListener {
+                          implements OnClickListener, TimelineListFragment.OnTimeLineListItemClickListener {
     
     private static final String INTENT_ACTION_SLIDE = "com.kyocera.intent.action.SLIDE_OPEN";
     CustomReceiver mReceiver;
@@ -158,7 +158,7 @@ public class MainActivity extends FragmentActivity
         case R.id.create_new:
             Log.i(TAG,"menu create new ");
             FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
-            TimeLineListFragment timelineFragmentR = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
+            TimelineListFragment timelineFragmentR = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
             timelineFragmentR.setColorTheme(new ColorThemeRed());
 
             
@@ -264,9 +264,9 @@ public class MainActivity extends FragmentActivity
 
                 // 左右のフラグメントでタイムライン更新だぜ
                 FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
-                TimeLineListFragment timelineFragmentL = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentL);
+                TimelineListFragment timelineFragmentL = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentL);
                 timelineFragmentL.updateHomeTimeLine(mAccessToken);
-                TimeLineListFragment timelineFragmentR = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
+                TimelineListFragment timelineFragmentR = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
                 timelineFragmentR.updateMentions(mAccessToken);
                 timelineFragmentR.setColorTheme(new ColorThemeGreen());
                 
@@ -286,7 +286,7 @@ public class MainActivity extends FragmentActivity
                 // normal tate
                 setContentView(R.layout.main_half_tate);
                 FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
-                TimeLineListFragment timelineFragmentHalf = (TimeLineListFragment)fm.findFragmentById(R.id.timelineFragmentHalf);
+                TimelineListFragment timelineFragmentHalf = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentHalf);
                 timelineFragmentHalf.updateHomeTimeLine(mAccessToken);
             }
         }

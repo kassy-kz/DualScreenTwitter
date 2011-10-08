@@ -26,7 +26,7 @@ import android.widget.ListView;
  * TimeLineリストを表示するフラグメントね
  * @author kashimoto
  */
-public class TimeLineListFragment extends ListFragment{
+public class TimelineListFragment extends ListFragment{
     
     private OnTimeLineListItemClickListener mListener;
     private TweetStatusAdapter mAdapter = null;

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_main_add"
+          android:icon="@android:drawable/ic_menu_add"
+          android:title="aaa" >
+        <menu>
+            <item
+                android:id="@+id/create_new"
+                android:title="create_new" />
+            <item
+                android:id="@+id/open"
+                android:title="open" />
+        </menu>
+    </item>
+    <item android:id="@+id/menu_id_tmp1"
+          android:icon="@android:drawable/ic_menu_agenda"
+          android:title="aaa" >
+    </item>
+    <item android:id="@+id/menu_id_tmp2"
+          android:icon="@android:drawable/ic_menu_call"
+          android:title="aaa" >
+    </item>
+    <item android:id="@+id/menu_main_tmp4"
+          android:icon="@android:drawable/ic_menu_add"
+          android:title="aaaaaa" >
+    </item>
+    <item android:id="@+id/menu_id_tmp5"
+          android:icon="@android:drawable/ic_menu_agenda"
+          android:title="aaaaaaaa" >
+    </item>
+    <item android:id="@+id/menu_id_tmp6"
+          android:icon="@android:drawable/ic_menu_call"
+          android:title="aaa" >
+    </item>
+    <item android:id="@+id/menu_main_tmp7"
+          android:icon="@android:drawable/ic_menu_add"
+          android:title="aaaaaaaa" >
+    </item>
+    <item android:id="@+id/menu_id_tmp8"
+          android:icon="@android:drawable/ic_menu_agenda"
+          android:title="aaa" >
+    </item>
+    <item android:id="@+id/menu_id_tmp9"
+          android:icon="@android:drawable/ic_menu_call"
+          android:title="aaa" >
+    </item>
+</menu>
