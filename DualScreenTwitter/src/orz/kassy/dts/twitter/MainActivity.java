@@ -53,7 +53,7 @@ import orz.kassy.dts.twitter.color.ColorThemeRed;
  * @author kashimoto
  */
 public class MainActivity extends FragmentActivity 
-                          implements OnClickListener, TimelineListFragment.OnTimeLineListItemClickListener {
+                          implements OnClickListener, TimelineListFragment.OnTimelineListItemClickListener {
     
     private static final String INTENT_ACTION_SLIDE = "com.kyocera.intent.action.SLIDE_OPEN";
     CustomReceiver mReceiver;

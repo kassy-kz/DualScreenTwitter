@@ -49,7 +49,7 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
 		ViewHolder holder = null;
 		
 		if(convertView == null) {
-			convertView = inflater.inflate(R.layout.timeline_layout, null);
+			convertView = inflater.inflate(R.layout.timeline_item, null);
 			holder = new ViewHolder();
 			holder.img_icon = (ImageView)convertView.findViewById(R.id.img_icon);
 			holder.lbl_screenname = (TextView)convertView.findViewById(R.id.lbl_screenname);

@@ -13,7 +13,7 @@
         android:layout_weight="1">
 
         <fragment
-            class="orz.kassy.dts.twitter.TimeLineListFragment"
+            class="orz.kassy.dts.twitter.TimelineListFragment"
             android:id="@+id/timelineFragmentL"
             android:layout_width ="fill_parent"
             android:layout_height="fill_parent" />
@@ -27,7 +27,7 @@
         android:layout_weight="1">
 
         <fragment
-            class="orz.kassy.dts.twitter.TimeLineListFragment"
+            class="orz.kassy.dts.twitter.TimelineListFragment"
             android:id="@+id/timelineFragmentR"
             android:layout_width ="fill_parent"
             android:layout_height="fill_parent" />
