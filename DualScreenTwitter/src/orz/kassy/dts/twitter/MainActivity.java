@@ -2,6 +2,9 @@ package orz.kassy.dts.twitter;
 
 import orz.kassy.dts.image.ImageCache;
 
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
 import com.kyocera.dualscreen.DualScreen;
 
 import twitter4j.AsyncTwitter;
@@ -41,6 +44,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 import orz.kassy.dts.twitter.R;
@@ -276,6 +280,12 @@ public class MainActivity extends FragmentActivity
                 //Utils.showToast(this, "yoko");
                 Button btn = (Button)findViewById(R.id.btnsend);
                 btn.setOnClickListener(this);
+                //AdMob setting
+                AdView adView = new AdView(this, AdSize.BANNER, "a14e939d84dfe72");
+                LinearLayout layout = (LinearLayout)findViewById(R.id.admob);
+                layout.addView(adView);
+                AdRequest request = new AdRequest();
+                adView.loadAd(request);
             }
         } else {
             // for normal screen

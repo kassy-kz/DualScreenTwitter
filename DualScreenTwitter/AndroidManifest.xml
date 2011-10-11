@@ -3,8 +3,10 @@
       package="orz.kassy.dts.twitter"
       android:versionCode="1"
       android:versionName="1.0">
-    <uses-permission
-        android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <activity 
             android:name=".MainActivity"
@@ -22,8 +24,9 @@
             android:label="@string/app_name"  
             android:configChanges="orientation">
         </activity>
-
+        <activity android:name="com.google.ads.AdActivity" android:configChanges="keyboard|keyboardHidden|orientation"/>
         <uses-library android:name="com.kyocera.dualscreen"></uses-library>
+        <meta-data android:value="a14e939d84dfe72" android:name="ADMOB_PUBLISHER_ID" />
     </application>
-<uses-sdk android:minSdkVersion="8"></uses-sdk>
+    <uses-sdk android:minSdkVersion="8"></uses-sdk>
 </manifest> 

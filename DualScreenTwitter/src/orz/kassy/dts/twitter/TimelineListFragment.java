@@ -31,6 +31,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 
 /**
@@ -52,6 +54,11 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     private View mFooterView;
     private boolean mIsUpdating = false;
     private boolean mListAddFlag = false;
+    private ProgressBar mProgressBar;
+    private View mHeaderNormal;
+    private TextView mHeaderNormalText;
+    private View mHeaderProgress;
+    private TextView mHeaderProgressText;
     
     /**
      * リストをクリックした時の処理、　なにするかは決めてない 
@@ -67,7 +74,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     public void updateHomeTimeLine(AccessToken accessToken) {
         mAccessToken = accessToken;
         mAsyncTwitter.setOAuthAccessToken(mAccessToken);
-        getAsyncHomeTimeLine();
+        getAsyncHomeTimeline();
     }
     
     /**
@@ -101,17 +108,24 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         mListView.setOnItemClickListener(listItemClickListener);
         mUpdateButton = (Button)mView.findViewById(R.id.timelineUpdateButton);
         mUpdateButton.setOnClickListener(this);
+
+        // リストビューの設定
         mFooterView = inflater.inflate(R.layout.timeline_footer, null);
         mListView.addFooterView(mFooterView);
         mListView.setOnScrollListener(this);
+
+        // プログレスバーの設定
+        mProgressBar = (ProgressBar)mView.findViewById(R.id.timelineProgressBar);
+        mProgressBar.setMax(100); // 水平プログレスバーの最大値を設定
+        //mProgressBar.setProgress(20); // 水平プログレスバーの値を設定
+        //mProgressBar.setSecondaryProgress(60); // 水平プログレスバーのセカンダリ値を設定
+        mHeaderNormal = mView.findViewById(R.id.timelineNormalHeader);
+        mHeaderNormalText = (TextView) mView.findViewById(R.id.timelineTitleTextView);
+        mHeaderProgress = mView.findViewById(R.id.timelineProgressHeader);
+        mHeaderProgressText = (TextView) mView.findViewById(R.id.timelineProgressTitle);
         return mView;
     }
     
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -139,29 +153,54 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     /**
      * タイムラインの取得（公式AsyncTwitter）
      */
-    private void getAsyncHomeTimeLine() {
-        mAsyncTwitter.getHomeTimeline();
-        mIsUpdating = true;
+    private void getAsyncHomeTimeline() {
+        Paging paging = new Paging(1, 20);
+        getAsyncHomeTimeline(paging);
+    }
+    private void getAsyncHomeTimeline(Paging paging) {
+        if(!mIsUpdating){
+            mAsyncTwitter.getHomeTimeline(paging);
+            mHeaderNormal.setVisibility(View.GONE);
+            mHeaderProgress.setVisibility(View.VISIBLE);
+            mProgressBar.setProgress(10);
+            mIsUpdating = true;            
+        }
     }
 
     /**
      * Mentionラインの取得（公式AsyncTwitter）
      */
     private void getAsyncMentions() {
-        mAsyncTwitter.getMentions();
-        mIsUpdating = true;
+        Paging paging = new Paging(1, 20);
+        getAsyncMentions(paging);
+    }
+    private void getAsyncMentions(Paging paging) {
+        if(!mIsUpdating){
+            mHeaderNormal.setVisibility(View.GONE);
+            mHeaderProgress.setVisibility(View.VISIBLE);
+            mProgressBar.setProgress(10);
+            mAsyncTwitter.getMentions(paging);
+            mIsUpdating = true;
+        }
     }
     
-    // 後処理 ダイアログ消去とか　実はこれワーカースレッドぽい... ???
+    /**
+     *  後処理 ダイアログ消去とか　実はこれワーカースレッドぽい... ???
+     */
     TwitterListener mAsyncTwitterListener = new TwitterAdapter() {
         @Override
         public void gotHomeTimeline(ResponseList<Status> statuses) {
             mIsUpdating = false;
+            mProgressBar.setProgress(90);
+
             mAdapter = new TweetStatusAdapter(getActivity(), statuses);
             mHandler.post(new Runnable(){
                 @Override
                 public void run() {
-                    mListView.setAdapter(mAdapter);                   
+                    mListView.setAdapter(mAdapter);
+                    mProgressBar.setProgress(100);
+                    mHeaderNormal.setVisibility(View.VISIBLE);
+                    mHeaderProgress.setVisibility(View.GONE);
                 }
             });
         }
@@ -175,6 +214,9 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
                 @Override
                 public void run() {
                     mListView.setAdapter(mAdapter);                   
+                    mProgressBar.setProgress(100);
+                    mHeaderNormal.setVisibility(View.VISIBLE);
+                    mHeaderProgress.setVisibility(View.GONE);
                 }
             });
         }
@@ -193,8 +235,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         // 更新ボタン
         case R.id.timelineUpdateButton:
             Paging paging = new Paging(1, 20);
-            mAsyncTwitter.getHomeTimeline(paging);
-            mIsUpdating = true;
+            getAsyncHomeTimeline(paging);
             break;
         }
     }
@@ -205,12 +246,12 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         Log.i(TAG,"list scroll "+ firstVisibleItem + ", " + visibleItemCount + ", " + totalItemCount );
+        if(totalItemCount == 0) return;
         // 一番下までスクロールしたら
         if((firstVisibleItem + visibleItemCount) >= totalItemCount) {
             Log.i(TAG, "list scroll bottom");
             Paging paging = new Paging(2, 20);
-            mAsyncTwitter.getHomeTimeline(paging);
-            mIsUpdating = true;
+            getAsyncMentions(paging);
         }
     }
 
