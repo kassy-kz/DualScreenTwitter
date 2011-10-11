@@ -276,16 +276,18 @@ public class MainActivity extends FragmentActivity
                 
             } else {
                 //full yoko (＝)
-                setContentView(R.layout.main_full_yoko);
-                //Utils.showToast(this, "yoko");
-                Button btn = (Button)findViewById(R.id.btnsend);
-                btn.setOnClickListener(this);
+//                setContentView(R.layout.main_full_yoko);
+//                Button btn = (Button)findViewById(R.id.btnsend);
+//                btn.setOnClickListener(this);
                 //AdMob setting
-                AdView adView = new AdView(this, AdSize.BANNER, "a14e939d84dfe72");
-                LinearLayout layout = (LinearLayout)findViewById(R.id.admob);
-                layout.addView(adView);
-                AdRequest request = new AdRequest();
-                adView.loadAd(request);
+//                AdView adView = new AdView(this, AdSize.BANNER, "a14e939d84dfe72");
+//                LinearLayout layout = (LinearLayout)findViewById(R.id.admob);
+//                layout.addView(adView);
+//                AdRequest request = new AdRequest();
+//                adView.loadAd(request);
+                Intent intent = new Intent(MainActivity.this, MainYokoActivity.class);
+                startActivity(intent);
+                finish();
             }
         } else {
             // for normal screen
