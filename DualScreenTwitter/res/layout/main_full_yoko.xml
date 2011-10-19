@@ -3,50 +3,64 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="#ffffffff"
     android:orientation="vertical">
     <LinearLayout 
         android:layout_height="0px"
         android:layout_weight="1"
         android:layout_width="fill_parent">
         <LinearLayout
-            android:id="@+id/linearLayout1"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical" >
             <LinearLayout
-                android:id="@+id/linearLayout1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+                <TextView
+                    android:id="@+id/tweetRefText"
+                    android:text=""
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>            
+            <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
                 <EditText
-                    android:id="@+id/editText1"
+                    android:id="@+id/tweetEditText"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentLeft="true"
-                    android:layout_width="match_parent"
-                    android:layout_weight="1" 
+                    android:layout_width="0dip"
+                    android:layout_weight="5" 
+                    android:gravity="top"
                     android:layout_height="129dp">
-                    </EditText>
-                <Button
-                    android:id="@+id/btnsend"
-                    android:text=" Send "
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                </Button>
+                </EditText>
+                <RelativeLayout
+                    android:layout_height="fill_parent"
+                    android:layout_width="0dip"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tweetStrCount"
+                        android:text="140"
+                        android:textColor="#ff000000"
+                        android:textSize="20dip"
+                        android:layout_height="wrap_content"
+                        android:layout_width="fill_parent"
+                        android:gravity="center"
+                        >
+                    </TextView>
+                    <Button
+                        android:layout_height="wrap_content"
+                        android:textSize="20dip"
+                        android:id="@+id/sendButton"
+                        android:layout_width="fill_parent"
+                        android:text=" Send "
+                        android:layout_centerVertical="true">
+                    </Button>
+                </RelativeLayout>
             </LinearLayout>
-            <RadioGroup
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/RadioEcho"
-                    android:text="#Echo"></RadioButton>
-                <RadioButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="#jagyokohama"
-                    android:id="@+id/RadioJagYokohama"></RadioButton>
-            </RadioGroup>
             <LinearLayout
                 android:id="@+id/admob"
                 android:layout_width="fill_parent"

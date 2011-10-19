@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">D.S.Tweet</string>
+    <string name="app_name">DS Tweet</string>
     <string name="title_screen_status">Screen status</string>
     <string name="btn_update">Update</string>
     <string name="mode_fullscreen">Screen mode: Full</string>
@@ -24,5 +24,13 @@
     <string name="no_timeline">タイムラインを取得していません。</string>
     <string name="auth_wait_message">Twitter認証中…</string>
     <string name="wait_timeline_message">タイムライン取得中…</string>
+    <string name="title_tweet_normal">新規ツイート</string>
+    <string name="title_tweet_reply">リプライ</string>
+    <string name="title_tweet_mention">メンション</string>
+    <string name="timelineTitleHome">ホーム</string>
+    <string name="timelineTitleMention">メンション</string>
+    <string name="timelineTitleFavorite">お気に入り</string>
+    <string name="msg_tweetError">ツイートに失敗しました</string>
+    <string name="customToastRotateText">本体を回転して返信</string>
     
 </resources>

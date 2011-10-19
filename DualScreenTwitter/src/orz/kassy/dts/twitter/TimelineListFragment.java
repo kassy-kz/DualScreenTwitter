@@ -1,5 +1,7 @@
 package orz.kassy.dts.twitter;
 
+import java.util.List;
+
 import orz.kassy.dts.twitter.color.ColorTheme;
 import orz.kassy.dts.twitter.color.ColorThemeWhite;
 import twitter4j.AsyncTwitter;
@@ -33,7 +35,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+import android.widget.ImageButton;
 
 /**
  * TimeLineリストを表示するフラグメントね
@@ -42,6 +44,10 @@ import android.widget.TextView;
 public class TimelineListFragment extends Fragment implements OnClickListener, OnScrollListener{
     
     private static final String TAG = "TimeLineFragment";
+
+    private static final int FRAGMENT_MODE_HOMETIMELINE = 0;
+    private static final int FRAGMENT_MODE_MENTION = 1;
+
     private OnTimelineListItemClickListener mListener;
     private TweetStatusAdapter mAdapter = null;
     private Handler mHandler = new Handler();
@@ -50,22 +56,27 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     private AsyncTwitter mAsyncTwitter;
     private ListView mListView;
     private View mView;
-    private Button mUpdateButton;
+    private ImageButton mUpdateButton;
     private View mFooterView;
     private boolean mIsUpdating = false;
-    private boolean mListAddFlag = false;
     private ProgressBar mProgressBar;
     private View mHeaderNormal;
     private TextView mHeaderNormalText;
     private View mHeaderProgress;
     private TextView mHeaderProgressText;
+
+    // フラグメントモード　ホームタイムラインか、メンションか、とか...
+    private int mFragmentMode;
+    private int mPageCount=1;
+    // リストへの追記モードか否か... 
+    private boolean mListAddFlag = false;
     
     /**
      * リストをクリックした時の処理、　なにするかは決めてない 
      * @author kashimoto
      */
     public interface OnTimelineListItemClickListener {
-        void onPhotoListItemClick(int resId);
+        void onTimelineListItemClick(Status statusId);
     }
     
     /**
@@ -74,7 +85,13 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     public void updateHomeTimeLine(AccessToken accessToken) {
         mAccessToken = accessToken;
         mAsyncTwitter.setOAuthAccessToken(mAccessToken);
-        getAsyncHomeTimeline();
+        mFragmentMode = FRAGMENT_MODE_HOMETIMELINE;
+
+        // タイトル文字列の設定
+        mHeaderNormalText.setText(R.string.timelineTitleHome);
+        mHeaderProgressText.setText(R.string.timelineTitleHome);
+
+        getAsyncHomeTimelineFirst();
     }
     
     /**
@@ -83,8 +100,30 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     public void updateMentions(AccessToken accessToken) {
         mAccessToken = accessToken;
         mAsyncTwitter.setOAuthAccessToken(mAccessToken);
-        getAsyncMentions();
+        mFragmentMode = FRAGMENT_MODE_MENTION;
+
+        // タイトル文字列の設定
+        mHeaderNormalText.setText(R.string.timelineTitleMention);
+        mHeaderProgressText.setText(R.string.timelineTitleMention);
+
+        getAsyncMentionsFirst();
     }
+
+    /**
+     * このフラグメント内のリストビューをお気に入りタイムラインで更新しますよ 
+     */
+    public void updateFavorites(AccessToken accessToken) {
+        mAccessToken = accessToken;
+        mAsyncTwitter.setOAuthAccessToken(mAccessToken);
+        mFragmentMode = FRAGMENT_MODE_HOMETIMELINE;
+
+        // タイトル文字列の設定
+        mHeaderNormalText.setText(R.string.timelineTitleFavorite);
+        mHeaderProgressText.setText(R.string.timelineTitleFavorite);
+
+        getAsyncFavoritesFirst();
+    }
+
 
     /**
      * カラー変更しますよ
@@ -106,7 +145,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         mListView = (ListView) mView.findViewById(R.id.timelineListView);
         mListView.setScrollingCacheEnabled(false);
         mListView.setOnItemClickListener(listItemClickListener);
-        mUpdateButton = (Button)mView.findViewById(R.id.timelineUpdateButton);
+        mUpdateButton = (ImageButton)mView.findViewById(R.id.timelineUpdateButton);
         mUpdateButton.setOnClickListener(this);
 
         // リストビューの設定
@@ -143,46 +182,78 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         mAsyncTwitter.setOAuthAccessToken(mAccessToken);
     }
     
+    /**
+     * リストアイテムが押された時のリスナー
+     */
     private OnItemClickListener listItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> view, View arg1, int position, long id) {
             Log.e(TAG,"on item click "+position );
+            Status status = (Status) mListView.getItemAtPosition(position);
+            mListener.onTimelineListItemClick(status);
         }
     };
     
     /**
      * タイムラインの取得（公式AsyncTwitter）
      */
-    private void getAsyncHomeTimeline() {
+    private void getAsyncHomeTimelineFirst() {
+        mPageCount=1;        
         Paging paging = new Paging(1, 20);
-        getAsyncHomeTimeline(paging);
+        getAsyncHomeTimeline(paging, false);
+        mPageCount++;        
     }
-    private void getAsyncHomeTimeline(Paging paging) {
+    private void getAsyncHomeTimeline(Paging paging, boolean listAddFlag) {
         if(!mIsUpdating){
             mAsyncTwitter.getHomeTimeline(paging);
             mHeaderNormal.setVisibility(View.GONE);
             mHeaderProgress.setVisibility(View.VISIBLE);
             mProgressBar.setProgress(10);
             mIsUpdating = true;            
+            mListAddFlag = listAddFlag;
         }
     }
 
     /**
      * Mentionラインの取得（公式AsyncTwitter）
      */
-    private void getAsyncMentions() {
+    private void getAsyncMentionsFirst() {
+        mPageCount=1;        
         Paging paging = new Paging(1, 20);
-        getAsyncMentions(paging);
+        getAsyncMentions(paging, false);
+        mPageCount++;        
     }
-    private void getAsyncMentions(Paging paging) {
+    private void getAsyncMentions(Paging paging, boolean listAddFlag) {
         if(!mIsUpdating){
             mHeaderNormal.setVisibility(View.GONE);
             mHeaderProgress.setVisibility(View.VISIBLE);
             mProgressBar.setProgress(10);
             mAsyncTwitter.getMentions(paging);
             mIsUpdating = true;
+            mListAddFlag = listAddFlag;
         }
     }
+
+    /**
+     * Favoritesタイムラインの取得
+     */
+    private void getAsyncFavoritesFirst() {
+        mPageCount=1;        
+        Paging paging = new Paging(1, 20);
+        getAsyncFavorites(paging, false);
+        mPageCount++;        
+    }
+    private void getAsyncFavorites(Paging paging, boolean listAddFlag) {
+        if(!mIsUpdating){
+            mHeaderNormal.setVisibility(View.GONE);
+            mHeaderProgress.setVisibility(View.VISIBLE);
+            mProgressBar.setProgress(10);
+            mAsyncTwitter.getFavorites(mPageCount);
+            mIsUpdating = true;
+            mListAddFlag = listAddFlag;
+        }
+    }
+
     
     /**
      *  後処理 ダイアログ消去とか　実はこれワーカースレッドぽい... ???
@@ -193,20 +264,63 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
             mIsUpdating = false;
             mProgressBar.setProgress(90);
 
-            mAdapter = new TweetStatusAdapter(getActivity(), statuses);
-            mHandler.post(new Runnable(){
-                @Override
-                public void run() {
-                    mListView.setAdapter(mAdapter);
-                    mProgressBar.setProgress(100);
-                    mHeaderNormal.setVisibility(View.VISIBLE);
-                    mHeaderProgress.setVisibility(View.GONE);
-                }
-            });
+            // 追加取得の場合
+            if(mListAddFlag) {
+                mAdapter.addAll(statuses);
+                mHandler.post(new Runnable(){
+                    @Override
+                    public void run() {
+                        mAdapter.notifyDataSetChanged();
+                        completeProgressBar();
+                    }
+
+                });
+//                mAdapter = new TweetStatusAdapter(getActivity(), statuses);
+            // 新規取得の場合
+            } else {
+                mAdapter = new TweetStatusAdapter(getActivity(), statuses);
+                mHandler.post(new Runnable(){
+                    @Override
+                    public void run() {
+                        mListView.setAdapter(mAdapter);
+                        completeProgressBar();
+                    }
+                });
+            }
         }
+        
         
         @Override
         public void gotMentions(ResponseList<Status> statuses) {
+            mIsUpdating = false;
+            mProgressBar.setProgress(90);
+
+            // 追加取得の場合
+            if(mListAddFlag) {
+                mAdapter.addAll(statuses);
+                mHandler.post(new Runnable(){
+                    @Override
+                    public void run() {
+                        mAdapter.notifyDataSetChanged();
+                        completeProgressBar();
+                    }
+                });
+            // 新規取得の場合
+            } else {
+                mAdapter = new TweetStatusAdapter(getActivity(), statuses);
+//                mAdapter.setColorTheme(mColorTheme);
+                mHandler.post(new Runnable(){
+                    @Override
+                    public void run() {
+                        mListView.setAdapter(mAdapter);                   
+                        completeProgressBar();
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void gotFavorites(ResponseList<Status> statuses) {
             mIsUpdating = false;
             mAdapter = new TweetStatusAdapter(getActivity(), statuses);
             mAdapter.setColorTheme(mColorTheme);
@@ -220,28 +334,48 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
                 }
             });
         }
-
+        
         @Override
         public void onException(TwitterException ex, TwitterMethod method) {
+            // 後処理UI
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Utils.showToast(getActivity(), R.string.msg_tweetError);
+                }
+            });
         }
     };
 
     /**
-     * ボタン押下リスナー
+     * プログレスバーをコンプリート（進捗１００）にする処理
+     */
+    private void completeProgressBar() {
+        mProgressBar.setProgress(100);
+        mHeaderNormal.setVisibility(View.VISIBLE);
+        mHeaderProgress.setVisibility(View.GONE);
+    }
+
+
+    /**
+     * ボタン押下リスナー(更新ボタンとかあるよ)
      */
     @Override
     public void onClick(View v) {
         switch(v.getId()) {
         // 更新ボタン
         case R.id.timelineUpdateButton:
-            Paging paging = new Paging(1, 20);
-            getAsyncHomeTimeline(paging);
+            if(mFragmentMode == FRAGMENT_MODE_HOMETIMELINE) {
+                getAsyncHomeTimelineFirst();
+            } else if(mFragmentMode == FRAGMENT_MODE_MENTION) {
+                getAsyncMentionsFirst();                
+            }
             break;
         }
     }
 
     /**
-     * スクロールリスナー
+     * スクロールリスナー　一番下までいったら続き取得とかするよ
      */
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
@@ -250,14 +384,20 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         // 一番下までスクロールしたら
         if((firstVisibleItem + visibleItemCount) >= totalItemCount) {
             Log.i(TAG, "list scroll bottom");
-            Paging paging = new Paging(2, 20);
-            getAsyncMentions(paging);
+            if(mFragmentMode == FRAGMENT_MODE_HOMETIMELINE){
+                Paging paging = new Paging(mPageCount, 20);
+                getAsyncHomeTimeline(paging, true);
+                mPageCount++;
+            } else if(mFragmentMode == FRAGMENT_MODE_MENTION) {
+                Paging paging = new Paging(mPageCount, 20);
+                getAsyncMentions(paging, true);            
+                mPageCount++;
+            }
         }
     }
 
     @Override
     public void onScrollStateChanged(AbsListView arg0, int arg1) {
-        // TODO Auto-generated method stub
-        
+        // 特に何もしない
     }
 }

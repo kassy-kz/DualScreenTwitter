@@ -7,6 +7,7 @@ import orz.kassy.dts.image.ImageCache;
 import orz.kassy.dts.twitter.R;
 import orz.kassy.dts.twitter.color.ColorTheme;
 import orz.kassy.dts.twitter.color.ColorThemeWhite;
+import twitter4j.ResponseList;
 import twitter4j.Status;
 
 import android.content.Context;
@@ -19,8 +20,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class TweetStatusAdapter extends ArrayAdapter<Status> {
-	private LayoutInflater inflater;
+	private LayoutInflater mInflater;
 	private ColorTheme mColorTheme = new ColorThemeWhite();
+    private List<Status> mStatusList;
 	
 	/**
 	 * コンストラクタ
@@ -32,9 +34,10 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
 	/**
 	 * コンストラクタ
 	 */
-	public TweetStatusAdapter(Context context, int textViewResourceId, List<Status> objects) {
-		super(context, textViewResourceId, objects);
-		inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	public TweetStatusAdapter(Context context, int textViewResourceId, List<Status> statusList) {
+		super(context, textViewResourceId, statusList);
+		mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		mStatusList = statusList;
 	}
 
 	/**
@@ -44,12 +47,22 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
 	    mColorTheme = colorTheme;
 	}
 	
+
+    public void addAll(ResponseList<Status> statuses) {
+        mStatusList.addAll(statuses);
+    }
+
+    @Override
+    public Status getItem(int position) {
+        return mStatusList.get(position);
+    }
+        
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder = null;
 		
 		if(convertView == null) {
-			convertView = inflater.inflate(R.layout.timeline_item, null);
+			convertView = mInflater.inflate(R.layout.timeline_item, null);
 			holder = new ViewHolder();
 			holder.img_icon = (ImageView)convertView.findViewById(R.id.img_icon);
 			holder.lbl_screenname = (TextView)convertView.findViewById(R.id.lbl_screenname);
@@ -93,11 +106,11 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
 		return convertView;
 	}
 	
-	class ViewHolder {
-		ImageView img_icon;
-		TextView lbl_screenname;
-		TextView lbl_name;
-		TextView lbl_tweet;
-		ThumbnailTask task;
-	}
+    class ViewHolder {
+        ImageView img_icon;
+        TextView lbl_screenname;
+        TextView lbl_name;
+        TextView lbl_tweet;
+        ThumbnailTask task;
+    }
 }

@@ -102,4 +102,13 @@ public class Utils {
 	    Toast.makeText(con, message, Toast.LENGTH_LONG).show();
 	}
 	
+	/**
+     * トーストを表示するよ
+     * @param con　コンテキスト
+     * @param resId メッセージのリソースID
+     */
+    public static void showToast(Context con, int resId){
+        Toast.makeText(con, resId, Toast.LENGTH_LONG).show();
+    }
+
 }

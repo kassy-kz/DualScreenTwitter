@@ -23,6 +23,20 @@ public class AppUtils {
     public static final String ACCESS_TOKEN_SECRET = "access_token_secret";
     public static final String AUTH_URL = "authurl";
     
+    public static final String TWEET_MODE = "tweet_mode";
+    public static final int TWEET_MODE_NORMAL = 0;
+    public static final int TWEET_MODE_MENTION = 1;
+    public static final int TWEET_MODE_DIRECT = 2;
+    public static final int TWEET_MODE_REPLY = 3;
+    public static final int TWEET_MODE_QT_REPLY = 4;
+    public static final int TWEET_MODE_QT_RETWEET = 5;
+    public static final int TWEET_MODE_RETWEET = 6;
+    public static final String IN_REPLY_TO_STATUS_ID = "in_reply_to_status_id";
+    public static final String IN_REPLY_TO_STATUS = "in_reply_to_status";
+    public static final String IN_REPLY_TO_STATUS_USERNAME = "in_reply_to_status_user_name";
+    public static final String IN_REPLY_TO_STATUS_TEXT = "in_reply_to_status_text";
+    
+    
     public static AccessToken loadAccessToken(Context context) {
         SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
         String token       = shPref.getString(ACCESS_TOKEN, null);

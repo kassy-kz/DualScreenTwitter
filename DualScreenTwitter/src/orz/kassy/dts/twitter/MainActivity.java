@@ -36,6 +36,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,7 +58,7 @@ import orz.kassy.dts.twitter.color.ColorThemeRed;
  * @author kashimoto
  */
 public class MainActivity extends FragmentActivity 
-                          implements OnClickListener, TimelineListFragment.OnTimelineListItemClickListener {
+                          implements TimelineListFragment.OnTimelineListItemClickListener {
     
     private static final String INTENT_ACTION_SLIDE = "com.kyocera.intent.action.SLIDE_OPEN";
     CustomReceiver mReceiver;
@@ -84,7 +85,14 @@ public class MainActivity extends FragmentActivity
 
 	private static final int MENU_ID_MENU1 = (Menu.FIRST + 1);
     private static final int MENU_ID_MENU2 = (Menu.FIRST + 2);
-	
+
+    // スタイルチェンジの時に引き継ぐ値たちね
+    // スタイルチェンジではActivityが生成され直すから、staticにする必要があるのよ
+    private static int sTweetModeFlag;
+    private static long sSelectedStatusId;
+    private static String sSelectedStatusUserName;
+    private static String sSelectedStatusText;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -119,12 +127,9 @@ public class MainActivity extends FragmentActivity
     @Override
     protected void onResume() {
         super.onResume();
-        //setScreenLayout();
-        // キーボード出すよ（横のときだけ）
-        if(AppUtils.isEchoYoko(self)) {
-            // 入力状態にする（キーボードを出現させる）
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        }
+        
+        sTweetModeFlag = AppUtils.TWEET_MODE_NORMAL;
+        sSelectedStatusId = 0;
     }
 
     @Override
@@ -245,7 +250,6 @@ public class MainActivity extends FragmentActivity
 	        setScreenLayout();
 	    }
 	};
-    static private int tmpCnt;
 
 	/**
 	 *  Echo のスタイルが変化するたびに呼ばれる。
@@ -275,6 +279,7 @@ public class MainActivity extends FragmentActivity
                 timelineFragmentR.setColorTheme(new ColorThemeGreen());
                 
             } else {
+                Log.e(TAG,"change state activity");
                 //full yoko (＝)
 //                setContentView(R.layout.main_full_yoko);
 //                Button btn = (Button)findViewById(R.id.btnsend);
@@ -286,6 +291,28 @@ public class MainActivity extends FragmentActivity
 //                AdRequest request = new AdRequest();
 //                adView.loadAd(request);
                 Intent intent = new Intent(MainActivity.this, MainYokoActivity.class);
+                switch(sTweetModeFlag) {
+                    case AppUtils.TWEET_MODE_MENTION:
+                        Log.e(TAG,"mention");
+                        intent.putExtra(AppUtils.TWEET_MODE, AppUtils.TWEET_MODE_MENTION);
+                        intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_ID, sSelectedStatusId);
+                        intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_TEXT, sSelectedStatusText);
+                        intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_USERNAME, sSelectedStatusUserName);
+
+                        break;
+                    case AppUtils.TWEET_MODE_REPLY:
+                        Log.e(TAG,"reply");
+                        intent.putExtra(AppUtils.TWEET_MODE, AppUtils.TWEET_MODE_REPLY);
+                        intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_ID, sSelectedStatusId);
+                        intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_TEXT, sSelectedStatusText);
+                        intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_USERNAME, sSelectedStatusUserName);
+                        break;
+                    default:
+                        Log.e(TAG,"normal");
+                        intent.putExtra(AppUtils.TWEET_MODE, AppUtils.TWEET_MODE_NORMAL);
+                        break;
+                }
+                unregisterReceiver(mReceiver);
                 startActivity(intent);
                 finish();
             }
@@ -322,26 +349,6 @@ public class MainActivity extends FragmentActivity
             }
         }
     }
-
-    @Override
-    public void onClick(View v) {
-        // 入力状態にする（キーボードを出現させる）
-        EditText editText = (EditText)findViewById(R.id.editText1);
-        editText.requestFocus();
-        InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);  
-        inputMethodManager.showSoftInput(editText, 0);  
-
-        if(v.getId()==R.id.btnsend){
-            Utils.showSimpleAlertDialog(this,"Send","send completed",oklistener,oklistener);
-        }
-    }
-    
-    DialogInterface.OnClickListener oklistener = new DialogInterface.OnClickListener(){
-        @Override
-        public void onClick(DialogInterface arg0, int arg1) {
-            setScreenLayout();
-        }
-    };
     
     /**
      * 認証処理の非同期タスク
@@ -443,9 +450,24 @@ public class MainActivity extends FragmentActivity
         };
     }
 
+    /**
+     * タイムラインのアイテムがクリックされたとき、呼ばれますよ
+     */
     @Override
-    public void onPhotoListItemClick(int resId) {
-        // TODO Auto-generated method stub
+    public void onTimelineListItemClick(Status status) {
+        //Log.e(TAG,"Clicked Timeline item" + statusId);
+        sSelectedStatusId = status.getId();
+        sSelectedStatusUserName = status.getUser().getScreenName();
+        sSelectedStatusText = status.getText();
+        sTweetModeFlag = AppUtils.TWEET_MODE_REPLY;
         
+        // カスタムトーストを表示しますお
+        LayoutInflater inflater = getLayoutInflater();
+        View v = inflater.inflate(R.layout.custom_toast_lead_rotate, null);
+        Toast mToast = new Toast(this);
+        mToast.setDuration(Toast.LENGTH_LONG);
+        mToast.setView(v);
+        mToast.show();
+
     }
 }
