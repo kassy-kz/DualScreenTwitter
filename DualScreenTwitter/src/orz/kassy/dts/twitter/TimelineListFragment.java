@@ -45,10 +45,11 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     
     private static final String TAG = "TimeLineFragment";
 
-    private static final int FRAGMENT_MODE_HOMETIMELINE = 0;
-    private static final int FRAGMENT_MODE_MENTION = 1;
+//    private static final int TIMELINE_TYPE_HOME = 0;
+//    private static final int AppUtils.TIMELINE_TYPE_MENTION = 1;
 
-    private OnTimelineListItemClickListener mListener;
+    private OnTimelineListItemClickListener mTimelineListener;
+    private OnSettingButtonClickListener mSettingListener;
     private TweetStatusAdapter mAdapter = null;
     private Handler mHandler = new Handler();
     private AccessToken mAccessToken = null;
@@ -57,6 +58,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     private ListView mListView;
     private View mView;
     private ImageButton mUpdateButton;
+    private ImageButton mSettingButton;
     private View mFooterView;
     private boolean mIsUpdating = false;
     private ProgressBar mProgressBar;
@@ -70,22 +72,119 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     private int mPageCount=1;
     // リストへの追記モードか否か... 
     private boolean mListAddFlag = false;
+    // このフラグメントのID　いろいろ使うよ
+    private int mThisFragmentId = 0;
+
     
     /**
-     * リストをクリックした時の処理、　なにするかは決めてない 
-     * @author kashimoto
+     * 初期処理
      */
-    public interface OnTimelineListItemClickListener {
-        void onTimelineListItemClick(Status statusId);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        mView = inflater.inflate(R.layout.timelinelist_fragment, container);
+        mListView = (ListView) mView.findViewById(R.id.timelineListView);
+        mListView.setScrollingCacheEnabled(false);
+        mListView.setOnItemClickListener(listItemClickListener);
+        mUpdateButton = (ImageButton)mView.findViewById(R.id.timelineUpdateButton);
+        mUpdateButton.setOnClickListener(this);
+        mSettingButton = (ImageButton)mView.findViewById(R.id.timelineSettingButton);
+        mSettingButton.setOnClickListener(this);
+
+        // リストビューの設定
+        mFooterView = inflater.inflate(R.layout.timeline_footer, null);
+        mListView.addFooterView(mFooterView);
+        mListView.setOnScrollListener(this);
+
+        // プログレスバーの設定
+        mProgressBar = (ProgressBar)mView.findViewById(R.id.timelineProgressBar);
+        mProgressBar.setMax(100); // 水平プログレスバーの最大値を設定
+        //mProgressBar.setProgress(20); // 水平プログレスバーの値を設定
+        //mProgressBar.setSecondaryProgress(60); // 水平プログレスバーのセカンダリ値を設定
+        mHeaderNormal = mView.findViewById(R.id.timelineNormalHeader);
+        mHeaderNormalText = (TextView) mView.findViewById(R.id.timelineTitleTextView);
+        mHeaderProgress = mView.findViewById(R.id.timelineProgressHeader);
+        mHeaderProgressText = (TextView) mView.findViewById(R.id.timelineProgressTitle);
+        return mView;
+    }
+    
+    /**
+     * 初期処理
+     */
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            mTimelineListener = (OnTimelineListItemClickListener)activity;
+            mSettingListener = (OnSettingButtonClickListener)activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnPhotoListItemClickListener");
+        }
+        
+        AsyncTwitterFactory factory = new AsyncTwitterFactory(mAsyncTwitterListener);
+        mAsyncTwitter = factory.getInstance();
+        mAsyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
+        mAsyncTwitter.setOAuthAccessToken(mAccessToken);
+    }
+
+    /**
+     * このフラグメントのタイムラインのタイプを設定しますよ
+     * @param type タイプ AppUtils.TIMELINE_TYPE_HOME... etc
+     */
+    public void setTimelineType(int type) {
+        // 状態フィールド更新
+        mFragmentMode = type;
+        // タイムライン更新
+        // updateTimeline(AppUtils.getAccessToken());
+    }
+    
+    /**
+     * このフラグメントのタイムラインの更新をします
+     * 状態フィールドを読んで、どのタイプか判断して更新しますよ
+     */
+    public void updateTimeline(AccessToken accessToken) {
+
+        mAccessToken = accessToken;
+        mAsyncTwitter.setOAuthAccessToken(mAccessToken);
+
+        switch(mFragmentMode){
+            case AppUtils.TIMELINE_TYPE_HOME:
+                // タイトル文字列の設定
+                mHeaderNormalText.setText(R.string.timelineTitleHome);
+                mHeaderProgressText.setText(R.string.timelineTitleHome);
+                getAsyncHomeTimelineFirst();
+                break;
+            case AppUtils.TIMELINE_TYPE_MENTION:
+                // タイトル文字列の設定
+                mHeaderNormalText.setText(R.string.timelineTitleMention);
+                mHeaderProgressText.setText(R.string.timelineTitleMention);
+                getAsyncMentionsFirst();                
+                break;
+            case AppUtils.TIMELINE_TYPE_FAVORITE:
+                // タイトル文字列の設定
+                mHeaderNormalText.setText(R.string.timelineTitleFavorite);
+                mHeaderProgressText.setText(R.string.timelineTitleFavorite);
+
+                break;
+            case AppUtils.TIMELINE_TYPE_USERLIST:
+                // タイトル文字列の設定
+                mHeaderNormalText.setText(R.string.timelineTitleUserList);
+                mHeaderProgressText.setText(R.string.timelineTitleUserList);
+                
+                break;
+        }
     }
     
     /**
      * このフラグメント内のリストビューをメインタイムラインで更新しますよ 
+     * @deprecated
      */
     public void updateHomeTimeLine(AccessToken accessToken) {
         mAccessToken = accessToken;
         mAsyncTwitter.setOAuthAccessToken(mAccessToken);
-        mFragmentMode = FRAGMENT_MODE_HOMETIMELINE;
+        mFragmentMode = AppUtils.TIMELINE_TYPE_HOME;
 
         // タイトル文字列の設定
         mHeaderNormalText.setText(R.string.timelineTitleHome);
@@ -96,11 +195,12 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     
     /**
      * このフラグメント内のリストビューをMentionsでラインで更新しますよ 
+     * @deprecated
      */
     public void updateMentions(AccessToken accessToken) {
         mAccessToken = accessToken;
         mAsyncTwitter.setOAuthAccessToken(mAccessToken);
-        mFragmentMode = FRAGMENT_MODE_MENTION;
+        mFragmentMode = AppUtils.TIMELINE_TYPE_MENTION;
 
         // タイトル文字列の設定
         mHeaderNormalText.setText(R.string.timelineTitleMention);
@@ -115,7 +215,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     public void updateFavorites(AccessToken accessToken) {
         mAccessToken = accessToken;
         mAsyncTwitter.setOAuthAccessToken(mAccessToken);
-        mFragmentMode = FRAGMENT_MODE_HOMETIMELINE;
+        mFragmentMode = AppUtils.TIMELINE_TYPE_HOME;
 
         // タイトル文字列の設定
         mHeaderNormalText.setText(R.string.timelineTitleFavorite);
@@ -135,51 +235,14 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
             mAdapter.setColorTheme(colorTheme);
             mAdapter.notifyDataSetChanged();
         }
-        
     }
     
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
-        mView = inflater.inflate(R.layout.timelinelist_fragment, container);
-        mListView = (ListView) mView.findViewById(R.id.timelineListView);
-        mListView.setScrollingCacheEnabled(false);
-        mListView.setOnItemClickListener(listItemClickListener);
-        mUpdateButton = (ImageButton)mView.findViewById(R.id.timelineUpdateButton);
-        mUpdateButton.setOnClickListener(this);
-
-        // リストビューの設定
-        mFooterView = inflater.inflate(R.layout.timeline_footer, null);
-        mListView.addFooterView(mFooterView);
-        mListView.setOnScrollListener(this);
-
-        // プログレスバーの設定
-        mProgressBar = (ProgressBar)mView.findViewById(R.id.timelineProgressBar);
-        mProgressBar.setMax(100); // 水平プログレスバーの最大値を設定
-        //mProgressBar.setProgress(20); // 水平プログレスバーの値を設定
-        //mProgressBar.setSecondaryProgress(60); // 水平プログレスバーのセカンダリ値を設定
-        mHeaderNormal = mView.findViewById(R.id.timelineNormalHeader);
-        mHeaderNormalText = (TextView) mView.findViewById(R.id.timelineTitleTextView);
-        mHeaderProgress = mView.findViewById(R.id.timelineProgressHeader);
-        mHeaderProgressText = (TextView) mView.findViewById(R.id.timelineProgressTitle);
-        return mView;
-    }
-    
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        try {
-            mListener = (OnTimelineListItemClickListener)activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnPhotoListItemClickListener");
-        }
-        
-        AsyncTwitterFactory factory = new AsyncTwitterFactory(mAsyncTwitterListener);
-        mAsyncTwitter = factory.getInstance();
-        mAsyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
-        mAsyncTwitter.setOAuthAccessToken(mAccessToken);
+    /**
+     * このフラグメントのレイアウトIDをセットします。
+     * onclicklistenerでどのフラグメントが叩かれたか把握するためにね
+     */
+    public void setFragmentId(int fragmentId) {
+        mThisFragmentId  = fragmentId;
     }
     
     /**
@@ -190,7 +253,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         public void onItemClick(AdapterView<?> view, View arg1, int position, long id) {
             Log.e(TAG,"on item click "+position );
             Status status = (Status) mListView.getItemAtPosition(position);
-            mListener.onTimelineListItemClick(status);
+            mTimelineListener.onTimelineListItemClick(status);
         }
     };
     
@@ -256,7 +319,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
 
     
     /**
-     *  後処理 ダイアログ消去とか　実はこれワーカースレッドぽい... ???
+     *  後処理 ダイアログ消去とか　実はこれワーカースレッドぽいから注意な
      */
     TwitterListener mAsyncTwitterListener = new TwitterAdapter() {
         @Override
@@ -356,7 +419,6 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         mHeaderProgress.setVisibility(View.GONE);
     }
 
-
     /**
      * ボタン押下リスナー(更新ボタンとかあるよ)
      */
@@ -365,11 +427,17 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         switch(v.getId()) {
         // 更新ボタン
         case R.id.timelineUpdateButton:
-            if(mFragmentMode == FRAGMENT_MODE_HOMETIMELINE) {
+            if(mFragmentMode == AppUtils.TIMELINE_TYPE_HOME) {
                 getAsyncHomeTimelineFirst();
-            } else if(mFragmentMode == FRAGMENT_MODE_MENTION) {
+            } else if(mFragmentMode == AppUtils.TIMELINE_TYPE_MENTION) {
                 getAsyncMentionsFirst();                
             }
+            break;
+        case R.id.timelineSettingButton:
+            Log.e(TAG,"onSettingButton pressed");
+            mSettingListener.onSettingButtonClick(mThisFragmentId);
+            break;
+        default:
             break;
         }
     }
@@ -384,20 +452,41 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         // 一番下までスクロールしたら
         if((firstVisibleItem + visibleItemCount) >= totalItemCount) {
             Log.i(TAG, "list scroll bottom");
-            if(mFragmentMode == FRAGMENT_MODE_HOMETIMELINE){
+            if(mFragmentMode == AppUtils.TIMELINE_TYPE_HOME){
                 Paging paging = new Paging(mPageCount, 20);
                 getAsyncHomeTimeline(paging, true);
                 mPageCount++;
-            } else if(mFragmentMode == FRAGMENT_MODE_MENTION) {
+            } else if(mFragmentMode == AppUtils.TIMELINE_TYPE_MENTION) {
                 Paging paging = new Paging(mPageCount, 20);
                 getAsyncMentions(paging, true);            
                 mPageCount++;
             }
         }
     }
-
+    
     @Override
     public void onScrollStateChanged(AbsListView arg0, int arg1) {
         // 特に何もしない
     }
+
+    /**
+     * リストをクリックした時の処理、　なにするかは決めてない 
+     * @author kashimoto
+     */
+    public interface OnTimelineListItemClickListener {
+        void onTimelineListItemClick(Status statusId);
+    }
+
+    /**
+     * 更新ボタンをクリックした時の処理、　なにするかは決めてない 
+     * @author kashimoto
+     */
+    public interface OnSettingButtonClickListener {
+        /**
+         * 設定ボタン押されたら呼ばれるよ
+         * @param fragmentId ボタン押されたフラグメントのID、　設定されてないなら０を返すよ
+         */
+        void onSettingButtonClick(int fragmentId);
+    }
+
 }

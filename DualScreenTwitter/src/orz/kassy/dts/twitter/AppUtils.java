@@ -1,11 +1,17 @@
 package orz.kassy.dts.twitter;
 
+import orz.kassy.dts.twitter.color.ColorTheme;
+import orz.kassy.dts.twitter.color.ColorThemeGreen;
+import orz.kassy.dts.twitter.color.ColorThemeRed;
+import orz.kassy.dts.twitter.color.ColorThemeWhite;
+
 import com.kyocera.dualscreen.DualScreen;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
 import android.view.Display;
 import android.view.WindowManager;
 import twitter4j.http.AccessToken;
@@ -36,13 +42,145 @@ public class AppUtils {
     public static final String IN_REPLY_TO_STATUS_USERNAME = "in_reply_to_status_user_name";
     public static final String IN_REPLY_TO_STATUS_TEXT = "in_reply_to_status_text";
     
+    // カラーにまつわる値
+    private static final String LEFT_PAIN_COLOR = "left_pain_color";
+    private static final String RIGHT_PAIN_COLOR = "right_pain_color";
+    private static final String HALF_PAIN_COLOR = "half_pain_color";
+    public static final int COLOR_WHITE = 0;
+    public static final int COLOR_GREEN = 1;
+    public static final int COLOR_RED = 2;
+    private static ColorTheme colorThemeGreen = new ColorThemeGreen();
+    private static ColorTheme colorThemeWhite = new ColorThemeWhite();
+    private static ColorTheme colorThemeRed = new ColorThemeRed();
+    public static final ColorTheme[] COLOR_THEME_LIST = {colorThemeWhite, 
+                                                         colorThemeGreen, 
+                                                         colorThemeRed
+                                                        };
+    // タイプ（ホームとかメンションとか）にまつわる値
+    private static final String LEFT_PAIN_TYPE = "left_pain_type";
+    private static final String RIGHT_PAIN_TYPE = "right_pain_type";
+    private static final String HALF_PAIN_TYPE = "half_pain_type";    
+    public static final int TIMELINE_TYPE_HOME = 0;
+    public static final int TIMELINE_TYPE_MENTION = 1;
+    public static final int TIMELINE_TYPE_FAVORITE = 2;
+    public static final int TIMELINE_TYPE_USERLIST = 3;
+    public static final int[] TIMELINE_TYPE_LIST = {TIMELINE_TYPE_HOME, 
+                                                    TIMELINE_TYPE_MENTION, 
+                                                    TIMELINE_TYPE_FAVORITE,
+                                                    TIMELINE_TYPE_USERLIST
+                                                    };
+
+    // アクセストークンを保持してみる（仮だからな）
+    private static AccessToken sAccessToken = null;
+    /**
+     * アクセストークンをここからゲットするようにしてみよう
+     */
+    public static AccessToken getAccessToken() {
+        return sAccessToken;
+    }
     
+    /**
+     * タイムラインのカラーを取得するよ left rightは広げた時、halfは閉じた時のやつね
+     * @param context
+     * @return カラーの値ね、AppUtils.COLOR_WHITE...
+     */
+    public static int loadLeftPainColor(Context context) {
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        int leftPainColor       = shPref.getInt(LEFT_PAIN_COLOR, 0);
+        return leftPainColor;
+    }
+    public static int loadRightPainColor(Context context) {
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        int rightPainColor       = shPref.getInt(RIGHT_PAIN_COLOR, 0);
+        return rightPainColor;
+    }
+    public static int loadHalfPainColor(Context context) {
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        int halfPainColor       = shPref.getInt(HALF_PAIN_COLOR, 0);
+        return halfPainColor;
+    }
+    /**
+     * タイムラインのカラーを保存するよ
+     * @param context 
+     * @param color カラーの値ね、AppUtils.COLOR_WHITE...
+     */
+    public static void saveLeftPainColor(Context context, int color) {
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        Editor e = shPref.edit();
+        e.putInt(LEFT_PAIN_COLOR, color);
+        e.commit();
+    }
+    public static void saveRightPainColor(Context context, int color) {
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        Editor e = shPref.edit();
+        e.putInt(RIGHT_PAIN_COLOR, color);
+        e.commit();
+    }
+    public static void saveHalfPainColor(Context context, int color) {
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        Editor e = shPref.edit();
+        e.putInt(HALF_PAIN_COLOR, color);
+        e.commit();
+    }
+
+    /**
+     * タイムラインのタイプをロードするよ left rightは広げた時、halfは閉じた時のやつね
+     * @param context
+     * @return タイプの値ね、AppUtils.TIMELINE_TYPE_HOME...etc
+     */
+    public static int loadLeftPainType(Context context) {
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        int type  = shPref.getInt(LEFT_PAIN_TYPE, 0);
+        return type;
+    }
+    public static int loadRightPainType(Context context) {
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        int type  = shPref.getInt(RIGHT_PAIN_TYPE, 1);
+        return type;
+    }
+    public static int loadHalfPainType(Context context) {
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        int type  = shPref.getInt(HALF_PAIN_TYPE, 0);
+        return type;
+    }
+    /**
+     * タイムラインのタイプを保存するよ
+     * @param context 
+     * @param color タイプの値ね、AppUtils.TIMELINE_TYPE_HOME...etc
+     */
+    public static void saveLeftPainType(Context context, int type) {
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        Editor e = shPref.edit();
+        e.putInt(LEFT_PAIN_TYPE, type);
+        e.commit();
+    }
+    public static void saveRightPainType(Context context, int type) {
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        Editor e = shPref.edit();
+        e.putInt(RIGHT_PAIN_TYPE, type);
+        e.commit();
+    }
+    public static void saveHalfPainType(Context context, int type) {
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        Editor e = shPref.edit();
+        e.putInt(HALF_PAIN_TYPE, type);
+        e.commit();
+    }
+
+    
+    /**
+     * アクセストークンをロードします
+     * @param context
+     * @return
+     */
     public static AccessToken loadAccessToken(Context context) {
         SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
         String token       = shPref.getString(ACCESS_TOKEN, null);
         String tokenSecret = shPref.getString(ACCESS_TOKEN_SECRET, null);
 
         if(token != null && tokenSecret != null) {
+             // 仮のstatic変数
+            sAccessToken = new AccessToken(token, tokenSecret);
             return new AccessToken(token, tokenSecret);
         } else {
             return null;
@@ -50,16 +188,17 @@ public class AppUtils {
     }
 
     public static void saveAccessToken(Context context, AccessToken accessToken) {
-        
         SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
         String token       = accessToken.getToken();
         String tokenSecret = accessToken.getTokenSecret();
+
+        // 仮のstatic変数
+        sAccessToken = accessToken;
 
         Editor e = shPref.edit();
         e.putString(AppUtils.ACCESS_TOKEN, token);
         e.putString(AppUtils.ACCESS_TOKEN_SECRET, tokenSecret);
         e.commit();
-        
     }
 
     /**

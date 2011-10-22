@@ -34,6 +34,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -50,6 +51,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import orz.kassy.dts.twitter.R;
 import orz.kassy.dts.twitter.AppUtils;
+import orz.kassy.dts.twitter.color.ColorTheme;
 import orz.kassy.dts.twitter.color.ColorThemeGreen;
 import orz.kassy.dts.twitter.color.ColorThemeRed;
 
@@ -58,11 +60,12 @@ import orz.kassy.dts.twitter.color.ColorThemeRed;
  * @author kashimoto
  */
 public class MainActivity extends FragmentActivity 
-                          implements TimelineListFragment.OnTimelineListItemClickListener {
+                          implements TimelineListFragment.OnTimelineListItemClickListener, 
+                                     TimelineListFragment.OnSettingButtonClickListener{
     
     private static final String INTENT_ACTION_SLIDE = "com.kyocera.intent.action.SLIDE_OPEN";
     CustomReceiver mReceiver;
-    private static MainActivity self;
+    private static MainActivity mSelf;
     
 	private static final int TWITTER_AUTHORIZE = 0;
     private static final String TAG = null;
@@ -97,8 +100,7 @@ public class MainActivity extends FragmentActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        self = this;
-        //setContentView(R.layout.main);        
+        mSelf = this;
 
         // Echo DTS Setting 
         DualScreen.restrictOrientationAtFullScreen( this, ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED );
@@ -166,10 +168,11 @@ public class MainActivity extends FragmentActivity
         switch (item.getItemId()) {
         case R.id.create_new:
             Log.i(TAG,"menu create new ");
-            FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
+            FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
             TimelineListFragment timelineFragmentR = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
-            timelineFragmentR.setColorTheme(new ColorThemeRed());
-
+            ColorTheme ct = AppUtils.COLOR_THEME_LIST[AppUtils.loadRightPainColor(this)];
+            //timelineFragmentR.setColorTheme(new ColorThemeRed());
+            timelineFragmentR.setColorTheme(ct);
             
             ret = true;
             break;
@@ -220,7 +223,7 @@ public class MainActivity extends FragmentActivity
 							mAccessToken = mTwitter.getOAuthAccessToken(mToken, pincode);
 							// Preferenceに保存
                             // 本番モードのみ
-                            AppUtils.saveAccessToken(self, mAccessToken);
+                            AppUtils.saveAccessToken(mSelf, mAccessToken);
 							
 							// アクセス・トークンが取得できたら、リソース解放して、インスタンス再生成
 							mTwitter.shutdown();
@@ -254,7 +257,7 @@ public class MainActivity extends FragmentActivity
 	/**
 	 *  Echo のスタイルが変化するたびに呼ばれる。
 	 *  各形態に合わせた表示処理を行う　(setContentViewを呼ぶ)
-	 *  UIスレッドで呼ぶこと
+	 *  本メソッドはUIスレッドで呼ぶこと
 	 */
     private void setScreenLayout() {
         
@@ -268,28 +271,35 @@ public class MainActivity extends FragmentActivity
         if( screen_mode == DualScreen.FULL ) {
             // full tate (D|D)
             if( width > height ) {
+
+                // ここで全画面タテのレイアウトセット！
                 setContentView(R.layout.main_full_tate);
 
                 // 左右のフラグメントでタイムライン更新だぜ
-                FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
+                // 左ペイン
+                FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
                 TimelineListFragment timelineFragmentL = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentL);
-                timelineFragmentL.updateHomeTimeLine(mAccessToken);
+                // 左ペインのカラー設定
+                ColorTheme ctl = AppUtils.COLOR_THEME_LIST[AppUtils.loadLeftPainColor(this)];
+                timelineFragmentL.setColorTheme(ctl);
+                timelineFragmentL.setFragmentId(R.id.timelineFragmentL);
+                // 左ペイン更新
+                timelineFragmentL.setTimelineType(AppUtils.loadLeftPainType(this));
+                timelineFragmentL.updateTimeline(mAccessToken);
+
+                // 右ペイン
                 TimelineListFragment timelineFragmentR = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
-                timelineFragmentR.updateMentions(mAccessToken);
-                timelineFragmentR.setColorTheme(new ColorThemeGreen());
+                // 右ペインのカラー設定
+                ColorTheme ctr = AppUtils.COLOR_THEME_LIST[AppUtils.loadRightPainColor(this)];
+                timelineFragmentR.setColorTheme(ctr);
+                timelineFragmentR.setFragmentId(R.id.timelineFragmentR);
+                // 右ペイン更新
+                timelineFragmentR.setTimelineType(AppUtils.loadRightPainType(this));
+                timelineFragmentR.updateTimeline(mAccessToken);
                 
             } else {
                 Log.e(TAG,"change state activity");
-                //full yoko (＝)
-//                setContentView(R.layout.main_full_yoko);
-//                Button btn = (Button)findViewById(R.id.btnsend);
-//                btn.setOnClickListener(this);
-                //AdMob setting
-//                AdView adView = new AdView(this, AdSize.BANNER, "a14e939d84dfe72");
-//                LinearLayout layout = (LinearLayout)findViewById(R.id.admob);
-//                layout.addView(adView);
-//                AdRequest request = new AdRequest();
-//                adView.loadAd(request);
+                // 横向き画面に遷移するよ
                 Intent intent = new Intent(MainActivity.this, MainYokoActivity.class);
                 switch(sTweetModeFlag) {
                     case AppUtils.TWEET_MODE_MENTION:
@@ -298,7 +308,6 @@ public class MainActivity extends FragmentActivity
                         intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_ID, sSelectedStatusId);
                         intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_TEXT, sSelectedStatusText);
                         intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_USERNAME, sSelectedStatusUserName);
-
                         break;
                     case AppUtils.TWEET_MODE_REPLY:
                         Log.e(TAG,"reply");
@@ -324,7 +333,7 @@ public class MainActivity extends FragmentActivity
             } else {
                 // normal tate
                 setContentView(R.layout.main_half_tate);
-                FragmentManager fm = ((FragmentActivity) self).getSupportFragmentManager();
+                FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
                 TimelineListFragment timelineFragmentHalf = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentHalf);
                 timelineFragmentHalf.updateHomeTimeLine(mAccessToken);
             }
@@ -469,5 +478,37 @@ public class MainActivity extends FragmentActivity
         mToast.setView(v);
         mToast.show();
 
+    }
+
+    /**
+     * フラグメントの設定ボタンが押されたら...
+     * 設定フラグメントに遷移してみよう
+     */
+    @Override
+    public void onSettingButtonClick(int fragmentId) {
+
+        SettingTimelineFragment sfragment = new SettingTimelineFragment(fragmentId);
+
+        FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
+
+        // FragmentTransactionインスタンスを取得する
+        android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+        if(fragmentId == R.id.timelineFragmentL){
+            Log.e(TAG,"left fragment menu pressed");
+            // 置き換えレイアウト上の位置／トランジションアニメーションを指定する
+            ft.replace(R.id.timelineFragmentL, sfragment);
+        }else if(fragmentId == R.id.timelineFragmentR){
+            Log.e(TAG,"right fragment menu pressed");
+            // 置き換えレイアウト上の位置／トランジションアニメーションを指定する
+            ft.replace(R.id.timelineFragmentR, sfragment);
+        }
+
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        // バックスタックに入れる
+        ft.addToBackStack(null);
+        
+        // Transactionを実行する
+        ft.commit();
     }
 }

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <FrameLayout
+        android:id="@+id/timelineNormalHeader"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/timelineTitleTextView" 
+            android:text="tmp"
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content">
+        </TextView>
+    </FrameLayout>
+    <FrameLayout
+        android:id="@+id/timelineProgressHeader"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+        <ProgressBar 
+            android:id="@+id/timelineProgressBar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            style="?android:attr/progressBarStyleHorizontal"
+        />
+        <TextView
+            android:id="@+id/timelineProgressTitle" 
+            android:text="tmp"
+            android:layout_width="fill_parent" 
+            android:layout_height="wrap_content"    
+        />
+    </FrameLayout>
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/timelineListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ListView>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"    
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:layout_width="0dip"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:padding="20dip"
+                android:background="#11000000"
+                android:id="@+id/timelineUpdateButton"
+                android:src="@drawable/ic_menu_refresh" />
+
+            <ImageButton
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="5dip"
+                android:background="#11000000"
+                android:id="@+id/timelineSettingButton"
+                android:src="@android:drawable/ic_menu_preferences" />
+        </LinearLayout>
+    </FrameLayout>    
+</LinearLayout>

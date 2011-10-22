@@ -30,7 +30,14 @@
     <string name="timelineTitleHome">ホーム</string>
     <string name="timelineTitleMention">メンション</string>
     <string name="timelineTitleFavorite">お気に入り</string>
+    <string name="timelineTitleUserList">リスト</string>
     <string name="msg_tweetError">ツイートに失敗しました</string>
-    <string name="customToastRotateText">本体を回転して返信</string>
-    
+    <string name="customToastRotateText">本体を回転¥nして返信</string>
+    <string name="white">White</string>
+    <string name="green">Green</string>
+    <string name="red">Red</string>
+    <string name="setColorTitle">タイムラインのカラーを設定</string>
+    <string name="setTimelineTypeTitle">タイムラインの種類を設定</string>
+    <string name="setThisPain">このペインの設定</string>
+        
 </resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="5dip"
+    android:background="#ffffff"
+    android:orientation="vertical"
+    >
+    <TextView
+        android:text="@string/setColorTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        />
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:checkedButton="@+id/white"
+        android:id="@+id/setTimelineColorRadio">
+        <RadioButton
+            android:text="@string/white"
+            android:textColor="#000000"
+            android:id="@+id/setColorWhite"/>
+        <RadioButton
+            android:text="@string/green"
+            android:textColor="#000000"
+            android:id="@+id/setColorGreen" />
+        <RadioButton
+            android:text="@string/red"
+            android:textColor="#000000"
+            android:id="@+id/setColorRed" />
+        <TextView
+            android:text="tmp"
+            android:textColor="#000000"
+            android:id="@+id/setColorChoice" />
+    </RadioGroup>
+    
+</LinearLayout>
