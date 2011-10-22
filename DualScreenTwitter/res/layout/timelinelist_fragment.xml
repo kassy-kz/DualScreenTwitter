@@ -52,7 +52,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
                 android:padding="20dip"
-                android:background="#11000000"
+                android:background="@xml/fragment_btn_bgcolor"
                 android:id="@+id/timelineUpdateButton"
                 android:src="@drawable/ic_menu_refresh" />
 
@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:padding="5dip"
-                android:background="#11000000"
+                android:background="@xml/fragment_btn_bgcolor"
                 android:id="@+id/timelineSettingButton"
                 android:src="@android:drawable/ic_menu_preferences" />
         </LinearLayout>
