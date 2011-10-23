@@ -4,7 +4,7 @@ public class ColorThemeGreen extends ColorTheme{
 
     @Override
     public int getTextColor() {
-        return 0xff2f4f4f;
+        return 0xff000000;
     }
     @Override
     public int getBackgroundColor() {

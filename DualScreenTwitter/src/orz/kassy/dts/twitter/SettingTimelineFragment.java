@@ -1,10 +1,12 @@
 package orz.kassy.dts.twitter;
 
+import orz.kassy.dts.twitter.color.ColorTheme;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -27,16 +29,21 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
     private RadioGroup mColorRadioGroup;
     private RadioGroup mTypeRadioGroup;
     private int mTimelineId;
+    private TimelineListFragment mTlFragment = null;
     
     /**
      * コンストラクタ
      * @param timelineId　設定先のtimelinefragmentのリソースID
      */
-    public SettingTimelineFragment(int timelineId) {
+    public SettingTimelineFragment(int timelineId, TimelineListFragment tlFragment) {
         super();
+        mTlFragment = tlFragment;
         mTimelineId = timelineId;
     }
     
+    /**
+     * フラグメント標準の初期処理
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -60,6 +67,18 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
         mTypeRadioGroup.setOnCheckedChangeListener(this);
 
         return view;
+    }
+    
+    /**
+     * フラグメント標準の終了処理
+     * この中でフラグメントを終えます。popBackStackしてるだけなので、
+     * 反対側のフラグメントを終了させるとか暴走するかも注意
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        fm.popBackStack();
     }
     
     private class MyPagerAdapter extends PagerAdapter{
@@ -193,6 +212,7 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
                 }
                 break;
             case R.id.setColorWhite:
+                mTlFragment.setColorTheme(AppUtils.COLOR_THEME_LIST[AppUtils.COLOR_WHITE]);
                 if(mTimelineId == R.id.timelineFragmentL) {
                     AppUtils.saveLeftPainColor(getActivity(), AppUtils.COLOR_WHITE);
                 }else if(mTimelineId == R.id.timelineFragmentR) {
@@ -202,6 +222,7 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
                 }
                 break;
             case R.id.setColorGreen:
+                mTlFragment.setColorTheme(AppUtils.COLOR_THEME_LIST[AppUtils.COLOR_GREEN]);
                 if(mTimelineId == R.id.timelineFragmentL) {
                     AppUtils.saveLeftPainColor(getActivity(), AppUtils.COLOR_GREEN);
                 }else if(mTimelineId == R.id.timelineFragmentR) {
@@ -211,6 +232,7 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
                 }
                 break;
             case R.id.setColorRed:
+                mTlFragment.setColorTheme(AppUtils.COLOR_THEME_LIST[AppUtils.COLOR_RED]);
                 if(mTimelineId == R.id.timelineFragmentL) {
                     AppUtils.saveLeftPainColor(getActivity(), AppUtils.COLOR_RED);
                 }else if(mTimelineId == R.id.timelineFragmentR) {

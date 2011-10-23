@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">DS Tweet</string>
+    <string name="app_name">EchoTwit</string>
     <string name="title_screen_status">Screen status</string>
     <string name="btn_update">Update</string>
     <string name="mode_fullscreen">Screen mode: Full</string>

@@ -487,9 +487,10 @@ public class MainActivity extends FragmentActivity
     @Override
     public void onSettingButtonClick(int fragmentId) {
 
-        SettingTimelineFragment sfragment = new SettingTimelineFragment(fragmentId);
-
         FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
+        TimelineListFragment tlFragment = (TimelineListFragment)fm.findFragmentById(fragmentId);
+
+        SettingTimelineFragment sfragment = new SettingTimelineFragment(fragmentId, tlFragment);
 
         // FragmentTransactionインスタンスを取得する
         android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -507,7 +508,6 @@ public class MainActivity extends FragmentActivity
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         // バックスタックに入れる
         ft.addToBackStack(null);
-        
         // Transactionを実行する
         ft.commit();
     }
