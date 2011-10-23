@@ -48,19 +48,20 @@
             android:orientation="horizontal">
 
             <ImageButton
-                android:layout_width="0dip"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                android:padding="20dip"
-                android:background="@xml/fragment_btn_bgcolor"
                 android:id="@+id/timelineUpdateButton"
+                android:layout_width="0dip"
+                android:layout_height="40dip"
+                android:padding="2dip"
+                android:scaleType="fitCenter"
+                android:layout_weight="1"
+                android:background="@xml/fragment_btn_bgcolor"
                 android:src="@drawable/ic_menu_refresh" />
 
             <ImageButton
                 android:layout_width="0dip"
-                android:layout_height="wrap_content"
+                android:layout_height="40dip"
                 android:layout_weight="1"
-                android:padding="5dip"
+                android:scaleType="fitCenter"
                 android:background="@xml/fragment_btn_bgcolor"
                 android:id="@+id/timelineSettingButton"
                 android:src="@android:drawable/ic_menu_preferences" />

@@ -16,6 +16,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -246,9 +249,17 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         public void onItemClick(AdapterView<?> view, View arg1, int position, long id) {
             Log.e(TAG,"on item click "+position );
             Status status = (Status) mListView.getItemAtPosition(position);
-            mTimelineListener.onTimelineListItemClick(status);
+            mTimelineListener.onTimelineListItemClick(mThisFragmentId, position, status);
         }
     };
+    
+    /**
+     * タイムラインを選択状態にします
+     * @param position　ポジション、選択解除には-1とか入れてね
+     */
+    public void setSelected(int position) {
+        mAdapter.setSelected(position); 
+    }
     
     /**
      * タイムラインの取得（公式AsyncTwitter）
@@ -440,11 +451,11 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
      */
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        Log.i(TAG,"list scroll "+ firstVisibleItem + ", " + visibleItemCount + ", " + totalItemCount );
+        //Log.i(TAG,"list scroll "+ firstVisibleItem + ", " + visibleItemCount + ", " + totalItemCount );
         if(totalItemCount == 0) return;
         // 一番下までスクロールしたら
         if((firstVisibleItem + visibleItemCount) >= totalItemCount) {
-            Log.i(TAG, "list scroll bottom");
+            //Log.i(TAG, "list scroll bottom");
             if(mFragmentMode == AppUtils.TIMELINE_TYPE_HOME){
                 Paging paging = new Paging(mPageCount, 20);
                 getAsyncHomeTimeline(paging, true);
@@ -463,15 +474,16 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     }
 
     /**
-     * リストをクリックした時の処理、　なにするかは決めてない 
+     * リストをクリックした時の処理、Activityに渡すほうね 
      * @author kashimoto
      */
     public interface OnTimelineListItemClickListener {
-        void onTimelineListItemClick(Status statusId);
+        // 押された奴の表示を更新する処理
+        void onTimelineListItemClick(int fragmentId, int position,  Status statusId);
     }
 
     /**
-     * 更新ボタンをクリックした時の処理、　なにするかは決めてない 
+     * 更新ボタンをクリックした時の処理、Activityに渡すほうね 
      * @author kashimoto
      */
     public interface OnSettingButtonClickListener {
@@ -481,5 +493,22 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
          */
         void onSettingButtonClick(int fragmentId);
     }
+    
+    
+    private void createSettingFragment(int fragmentId) {
 
+        FragmentManager fm = ((FragmentActivity) getActivity()).getSupportFragmentManager();
+        TimelineListFragment tlFragment = (TimelineListFragment)fm.findFragmentById(fragmentId);
+
+        SettingTimelineFragment sfragment = new SettingTimelineFragment(fragmentId, tlFragment);
+
+        // FragmentTransactionインスタンスを取得する
+        android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(mThisFragmentId, sfragment);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        // バックスタックに入れる
+        ft.addToBackStack(null);
+        // Transactionを実行する
+        ft.commit();
+    }
 }

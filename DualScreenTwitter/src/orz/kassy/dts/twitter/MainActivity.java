@@ -463,7 +463,7 @@ public class MainActivity extends FragmentActivity
      * タイムラインのアイテムがクリックされたとき、呼ばれますよ
      */
     @Override
-    public void onTimelineListItemClick(Status status) {
+    public void onTimelineListItemClick(int fragmentId, int position, Status status) {
         //Log.e(TAG,"Clicked Timeline item" + statusId);
         sSelectedStatusId = status.getId();
         sSelectedStatusUserName = status.getUser().getScreenName();
@@ -471,15 +471,30 @@ public class MainActivity extends FragmentActivity
         sTweetModeFlag = AppUtils.TWEET_MODE_REPLY;
         
         // カスタムトーストを表示しますお
+        // showCustomToast();
+        
+        // タイムラインの色を変えますお
+        FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
+        TimelineListFragment timelineFragmentL = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentL);
+        TimelineListFragment timelineFragmentR = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
+        if(fragmentId == R.id.timelineFragmentL) {
+            timelineFragmentL.setSelected(position);
+            timelineFragmentR.setSelected(-1);
+        } else if(fragmentId == R.id.timelineFragmentR) {
+            timelineFragmentR.setSelected(position);
+            timelineFragmentL.setSelected(-1);
+        }
+    }
+
+    private void showCustomToast() {
         LayoutInflater inflater = getLayoutInflater();
         View v = inflater.inflate(R.layout.custom_toast_lead_rotate, null);
         Toast mToast = new Toast(this);
         mToast.setDuration(Toast.LENGTH_LONG);
         mToast.setView(v);
         mToast.show();
-
     }
-
+    
     /**
      * フラグメントの設定ボタンが押されたら...
      * 設定フラグメントに遷移してみよう
