@@ -333,9 +333,21 @@ public class MainActivity extends FragmentActivity
             } else {
                 // normal tate
                 setContentView(R.layout.main_half_tate);
+                
+                // ハーフペイン
                 FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
                 TimelineListFragment timelineFragmentHalf = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentHalf);
-                timelineFragmentHalf.updateHomeTimeLine(mAccessToken);
+                // ハーフペインのカラー設定
+                ColorTheme ctl = AppUtils.COLOR_THEME_LIST[AppUtils.loadHalfPainColor(this)];
+                timelineFragmentHalf.setColorTheme(ctl);
+                timelineFragmentHalf.setFragmentId(R.id.timelineFragmentHalf);
+                // ハーフペイン更新
+                timelineFragmentHalf.setTimelineType(AppUtils.loadHalfPainType(this));
+                timelineFragmentHalf.updateTimeline(mAccessToken);
+
+//                FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
+//                TimelineListFragment timelineFragmentHalf = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentHalf);
+//                timelineFragmentHalf.updateHomeTimeLine(mAccessToken);
             }
         }
     }

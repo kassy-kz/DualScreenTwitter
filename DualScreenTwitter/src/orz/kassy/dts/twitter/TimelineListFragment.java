@@ -439,7 +439,8 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
             break;
         case R.id.timelineSettingButton:
             Log.e(TAG,"onSettingButton pressed");
-            mSettingListener.onSettingButtonClick(mThisFragmentId);
+            // mSettingListener.onSettingButtonClick(mThisFragmentId);
+            createSettingFragment();
             break;
         default:
             break;
@@ -495,16 +496,16 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     }
     
     
-    private void createSettingFragment(int fragmentId) {
+    private void createSettingFragment() {
 
         FragmentManager fm = ((FragmentActivity) getActivity()).getSupportFragmentManager();
-        TimelineListFragment tlFragment = (TimelineListFragment)fm.findFragmentById(fragmentId);
+        TimelineListFragment tlFragment = (TimelineListFragment)fm.findFragmentById(getId());
 
-        SettingTimelineFragment sfragment = new SettingTimelineFragment(fragmentId, tlFragment);
+        SettingTimelineFragment sfragment = new SettingTimelineFragment(getId(), tlFragment);
 
         // FragmentTransactionインスタンスを取得する
         android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(mThisFragmentId, sfragment);
+        ft.replace(getId(), sfragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         // バックスタックに入れる
         ft.addToBackStack(null);
