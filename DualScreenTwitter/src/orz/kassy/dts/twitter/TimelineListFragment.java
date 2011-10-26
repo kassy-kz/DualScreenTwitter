@@ -68,12 +68,13 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     private int mPageCount=1;
     // リストへの追記モードか否か... 
     private boolean mListAddFlag = false;
-    // このフラグメントのID　いろいろ使うよ
-    private int mThisFragmentId = 0;
+    // このフラグメントのID　いろいろ使うよ でもgetIdで取れるからいらなかった...
+    //private int mThisFragmentId = 0;
 
+    private boolean mExistList = false;
     
     /**
-     * 初期処理
+     * 初期処理３
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -105,7 +106,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     }
     
     /**
-     * 初期処理
+     * 初期処理１
      */
     @Override
     public void onAttach(Activity activity) {
@@ -123,6 +124,33 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         mAsyncTwitter = factory.getInstance();
         mAsyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
         mAsyncTwitter.setOAuthAccessToken(mAccessToken);
+    }
+    
+    /**
+     * 初期処理２
+     */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if(savedInstanceState == null) {
+            return ;
+        }
+        if(savedInstanceState.getBoolean(AppUtils.BUNDLE_IS_EXIST_LIST)) {
+            mExistList = true;
+            ResponseList<Status> statuses = (ResponseList<Status>) savedInstanceState.getSerializable(AppUtils.BUNDLE_RESPONSE_LIST);
+            //mAdapter = new TweetStatusAdapter(getActivity(), statuses);
+            Log.e(TAG,"statuses = ");
+        }
+    }
+    
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(mAdapter == null) {
+            return ;
+        }
+        outState.putBoolean(AppUtils.BUNDLE_IS_EXIST_LIST, true);
+        outState.putSerializable(AppUtils.BUNDLE_RESPONSE_LIST, (ResponseList<Status>)mAdapter.getList());
     }
 
     /**
@@ -172,39 +200,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
                 break;
         }
     }
-    
-    /**
-     * このフラグメント内のリストビューをメインタイムラインで更新しますよ 
-     * @deprecated
-     */
-    public void updateHomeTimeLine(AccessToken accessToken) {
-        mAccessToken = accessToken;
-        mAsyncTwitter.setOAuthAccessToken(mAccessToken);
-        mFragmentMode = AppUtils.TIMELINE_TYPE_HOME;
-
-        // タイトル文字列の設定
-        mHeaderNormalText.setText(R.string.timelineTitleHome);
-        mHeaderProgressText.setText(R.string.timelineTitleHome);
-
-        getAsyncHomeTimelineFirst();
-    }
-    
-    /**
-     * このフラグメント内のリストビューをMentionsでラインで更新しますよ 
-     * @deprecated
-     */
-    public void updateMentions(AccessToken accessToken) {
-        mAccessToken = accessToken;
-        mAsyncTwitter.setOAuthAccessToken(mAccessToken);
-        mFragmentMode = AppUtils.TIMELINE_TYPE_MENTION;
-
-        // タイトル文字列の設定
-        mHeaderNormalText.setText(R.string.timelineTitleMention);
-        mHeaderProgressText.setText(R.string.timelineTitleMention);
-
-        getAsyncMentionsFirst();
-    }
-
+        
     /**
      * このフラグメント内のリストビューをお気に入りタイムラインで更新しますよ 
      */
@@ -236,9 +232,10 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     /**
      * このフラグメントのレイアウトIDをセットします。
      * onclicklistenerでどのフラグメントが叩かれたか把握するためにね
+     * @deprecated
      */
     public void setFragmentId(int fragmentId) {
-        mThisFragmentId  = fragmentId;
+        //mThisFragmentId  = fragmentId;
     }
     
     /**
@@ -249,7 +246,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         public void onItemClick(AdapterView<?> view, View arg1, int position, long id) {
             Log.e(TAG,"on item click "+position );
             Status status = (Status) mListView.getItemAtPosition(position);
-            mTimelineListener.onTimelineListItemClick(mThisFragmentId, position, status);
+            mTimelineListener.onTimelineListItemClick(getId(), position, status);
         }
     };
     
@@ -258,7 +255,9 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
      * @param position　ポジション、選択解除には-1とか入れてね
      */
     public void setSelected(int position) {
-        mAdapter.setSelected(position); 
+        if(mAdapter != null) {
+            mAdapter.setSelected(position);
+        }
     }
     
     /**

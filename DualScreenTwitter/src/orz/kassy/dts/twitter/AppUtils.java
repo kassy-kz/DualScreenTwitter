@@ -41,6 +41,13 @@ public class AppUtils {
     public static final String IN_REPLY_TO_STATUS = "in_reply_to_status";
     public static final String IN_REPLY_TO_STATUS_USERNAME = "in_reply_to_status_user_name";
     public static final String IN_REPLY_TO_STATUS_TEXT = "in_reply_to_status_text";
+    public static final String IN_REPLY_TO_STATUS_ICONBMP = "in_reply_to_status_icon_bmp";
+    public static final String IN_REPLY_TO_STATUS_ICONURL = "in_reply_to_status_icon_url";
+
+    // バンドルにまつわる値
+    public static final String BUNDLE_RESPONSE_LIST = "bundle_response_list";
+    public static final String BUNDLE_IS_EXIST_LIST = "bundle_is_exist_list";
+
     
     // カラーにまつわる値
     private static final String LEFT_PAIN_COLOR = "left_pain_color";

@@ -1,5 +1,7 @@
 package orz.kassy.dts.twitter;
 
+import orz.kassy.dts.async.ThumbnailTask;
+import orz.kassy.dts.image.ImageCache;
 import twitter4j.AsyncTwitter;
 import twitter4j.AsyncTwitterFactory;
 import twitter4j.ResponseList;
@@ -17,20 +19,27 @@ import com.google.ads.AdView;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class MainYokoActivity extends Activity implements OnClickListener {
@@ -45,7 +54,8 @@ public class MainYokoActivity extends Activity implements OnClickListener {
     private TextView mTweetRefText;
     private MainYokoActivity mSelf;
     private final Handler mHandler = new Handler();
-
+    private final int WC = ViewGroup.LayoutParams.WRAP_CONTENT; 
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +76,8 @@ public class MainYokoActivity extends Activity implements OnClickListener {
         setContentView(R.layout.main_full_yoko);
         mSelf = this;
 
+
+        
         // 保存したAccessToken取得
         mAccessToken = AppUtils.loadAccessToken(this);
 
@@ -75,7 +87,7 @@ public class MainYokoActivity extends Activity implements OnClickListener {
         mTweetEditText = (EditText)findViewById(R.id.tweetEditText);
         mTweetEditText.addTextChangedListener(mTextWatcher);
         mTweetStrCountText = (TextView)findViewById(R.id.tweetStrCount);
-        mTweetRefText = (TextView)findViewById(R.id.tweetRefText);
+        //mTweetRefText = (TextView)findViewById(R.id.tweetRefText);
         
         int mode = getIntent().getIntExtra(AppUtils.TWEET_MODE, AppUtils.TWEET_MODE_NORMAL);
         String targetUserName = null;
@@ -90,9 +102,12 @@ public class MainYokoActivity extends Activity implements OnClickListener {
                 // ちなみに非同期にするときはshowStatusメソッドを使うよ
                 mInReplyTo = getIntent().getLongExtra(AppUtils.IN_REPLY_TO_STATUS_ID, 0);
                 targetUserName  = getIntent().getStringExtra(AppUtils.IN_REPLY_TO_STATUS_USERNAME);
+                String refText = getIntent().getStringExtra(AppUtils.IN_REPLY_TO_STATUS_TEXT);
+                String iconUrl = getIntent().getStringExtra(AppUtils.IN_REPLY_TO_STATUS_ICONURL);
+                setTweetHeaderView(targetUserName, refText, iconUrl);
                 mTweetEditText.setText("@"+targetUserName+" ");
                 mTweetEditText.setSelection(mTweetEditText.getText().length());
-                mTweetRefText.setText(getIntent().getStringExtra(AppUtils.IN_REPLY_TO_STATUS_TEXT));
+//                mTweetRefText.setText(refText);
                 break;
             case AppUtils.TWEET_MODE_MENTION:
                 setTitle(R.string.title_tweet_mention);
@@ -115,6 +130,27 @@ public class MainYokoActivity extends Activity implements OnClickListener {
         adView.loadAd(request);
     }
 
+    private void setTweetHeaderView(String targetName, String refText, String iconUrl) {
+        // 追加
+        LinearLayout header = (LinearLayout)findViewById(R.id.tweetHeaderItem);
+        RelativeLayout rl = (RelativeLayout) findViewById(R.id.tweetRefView);
+        rl.setVisibility(View.VISIBLE);
+        TextView lbl_screenname = (TextView)header.findViewById(R.id.tweetRefName);
+        lbl_screenname.setTextColor(0xff000000);
+        lbl_screenname.setText(targetName);
+        TextView lbl_tweet = (TextView)header.findViewById(R.id.tweetRefMessage);
+        lbl_tweet.setTextColor(0xff000000);
+        lbl_tweet.setText(refText);
+        // 画像どしよ...
+        ImageView imgIcon = (ImageView) findViewById(R.id.tweetRefImg);
+//        if(bmp != null) {
+//            imgIcon.setImageBitmap(bmp);
+//        }
+        ThumbnailTask task;
+        task = new ThumbnailTask(imgIcon);
+        task.execute(iconUrl, targetName);
+    }
+    
     @Override
     public void onResume() {
         super.onResume();

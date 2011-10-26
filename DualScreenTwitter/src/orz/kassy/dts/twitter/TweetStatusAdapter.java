@@ -59,6 +59,13 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
     }
     
     /**
+     * リスト返してもらう
+     */
+    public List<Status> getList() {
+        return mStatusList;
+    }
+    
+    /**
      * 選択箇所を色変更するよ
      * 選択解除するときは引数に-1とか入れるべし
      */

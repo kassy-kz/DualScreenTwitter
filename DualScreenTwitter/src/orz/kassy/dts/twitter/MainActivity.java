@@ -95,6 +95,7 @@ public class MainActivity extends FragmentActivity
     private static long sSelectedStatusId;
     private static String sSelectedStatusUserName;
     private static String sSelectedStatusText;
+    private static String sSelectedIconUrl;
 
 
     @Override
@@ -275,14 +276,14 @@ public class MainActivity extends FragmentActivity
                 // ここで全画面タテのレイアウトセット！
                 setContentView(R.layout.main_full_tate);
 
-                // 左右のフラグメントでタイムライン更新だぜ
+                // 左右のフラグメントでタイムラインを生成＆更新だぜ
                 // 左ペイン
                 FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
                 TimelineListFragment timelineFragmentL = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentL);
                 // 左ペインのカラー設定
                 ColorTheme ctl = AppUtils.COLOR_THEME_LIST[AppUtils.loadLeftPainColor(this)];
                 timelineFragmentL.setColorTheme(ctl);
-                timelineFragmentL.setFragmentId(R.id.timelineFragmentL);
+                //timelineFragmentL.setFragmentId(R.id.timelineFragmentL);
                 // 左ペイン更新
                 timelineFragmentL.setTimelineType(AppUtils.loadLeftPainType(this));
                 timelineFragmentL.updateTimeline(mAccessToken);
@@ -292,7 +293,7 @@ public class MainActivity extends FragmentActivity
                 // 右ペインのカラー設定
                 ColorTheme ctr = AppUtils.COLOR_THEME_LIST[AppUtils.loadRightPainColor(this)];
                 timelineFragmentR.setColorTheme(ctr);
-                timelineFragmentR.setFragmentId(R.id.timelineFragmentR);
+                //timelineFragmentR.setFragmentId(R.id.timelineFragmentR);
                 // 右ペイン更新
                 timelineFragmentR.setTimelineType(AppUtils.loadRightPainType(this));
                 timelineFragmentR.updateTimeline(mAccessToken);
@@ -308,6 +309,7 @@ public class MainActivity extends FragmentActivity
                         intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_ID, sSelectedStatusId);
                         intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_TEXT, sSelectedStatusText);
                         intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_USERNAME, sSelectedStatusUserName);
+                        intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_ICONURL, sSelectedIconUrl);
                         break;
                     case AppUtils.TWEET_MODE_REPLY:
                         Log.e(TAG,"reply");
@@ -315,6 +317,7 @@ public class MainActivity extends FragmentActivity
                         intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_ID, sSelectedStatusId);
                         intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_TEXT, sSelectedStatusText);
                         intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_USERNAME, sSelectedStatusUserName);
+                        intent.putExtra(AppUtils.IN_REPLY_TO_STATUS_ICONURL, sSelectedIconUrl);
                         break;
                     default:
                         Log.e(TAG,"normal");
@@ -340,7 +343,7 @@ public class MainActivity extends FragmentActivity
                 // ハーフペインのカラー設定
                 ColorTheme ctl = AppUtils.COLOR_THEME_LIST[AppUtils.loadHalfPainColor(this)];
                 timelineFragmentHalf.setColorTheme(ctl);
-                timelineFragmentHalf.setFragmentId(R.id.timelineFragmentHalf);
+                //timelineFragmentHalf.setFragmentId(R.id.timelineFragmentHalf);
                 // ハーフペイン更新
                 timelineFragmentHalf.setTimelineType(AppUtils.loadHalfPainType(this));
                 timelineFragmentHalf.updateTimeline(mAccessToken);
@@ -479,6 +482,7 @@ public class MainActivity extends FragmentActivity
         //Log.e(TAG,"Clicked Timeline item" + statusId);
         sSelectedStatusId = status.getId();
         sSelectedStatusUserName = status.getUser().getScreenName();
+        sSelectedIconUrl = status.getUser().getProfileImageURL().toString();
         sSelectedStatusText = status.getText();
         sTweetModeFlag = AppUtils.TWEET_MODE_REPLY;
         
