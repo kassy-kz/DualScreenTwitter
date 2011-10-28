@@ -14,23 +14,23 @@
     </item>
     <item android:id="@+id/menu_id_tmp1"
           android:icon="@android:drawable/ic_menu_agenda"
-          android:title="aaa" >
+          android:title="tmp1" >
     </item>
     <item android:id="@+id/menu_id_tmp2"
           android:icon="@android:drawable/ic_menu_call"
-          android:title="aaa" >
+          android:title="tmp2" >
     </item>
     <item android:id="@+id/menu_main_tmp4"
           android:icon="@android:drawable/ic_menu_add"
-          android:title="aaaaaa" >
+          android:title="tmp4" >
     </item>
     <item android:id="@+id/menu_id_tmp5"
           android:icon="@android:drawable/ic_menu_agenda"
-          android:title="aaaaaaaa" >
+          android:title="tmp5" >
     </item>
     <item android:id="@+id/menu_id_tmp6"
           android:icon="@android:drawable/ic_menu_call"
-          android:title="aaa" >
+          android:title="tmp6" >
     </item>
     <item android:id="@+id/menu_main_tmp7"
           android:icon="@android:drawable/ic_menu_add"

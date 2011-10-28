@@ -12,7 +12,6 @@
             android:name=".MainActivity"
             android:theme="@android:style/Theme.Light.NoTitleBar"
             android:label="@string/app_name">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -20,7 +19,8 @@
         </activity>
         <activity 
             android:name=".MainYokoActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustUnspecified">
         </activity>        
         <activity 
             android:icon="@drawable/icon" 
@@ -28,7 +28,9 @@
             android:label="@string/app_name"  
             android:configChanges="orientation">
         </activity>
-        <activity android:name="com.google.ads.AdActivity" android:configChanges="keyboard|keyboardHidden|orientation"/>
+        <activity
+            android:configChanges="keyboard|keyboardHidden|orientation"
+            android:name="com.google.ads.AdActivity" />
         <uses-library android:name="com.kyocera.dualscreen"></uses-library>
         <meta-data android:value="a14e939d84dfe72" android:name="ADMOB_PUBLISHER_ID" />
     </application>

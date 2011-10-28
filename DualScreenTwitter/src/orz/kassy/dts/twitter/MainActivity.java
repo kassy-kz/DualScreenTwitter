@@ -124,13 +124,22 @@ public class MainActivity extends FragmentActivity
         } else {
             // 表示処理を行います
             setScreenLayout();
+            //Utils.showToast(this, R.string.toast_rotate_info_tate);
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        Log.i(TAG,"onResume");
         
+        // SettingFragment解除
+        FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
+        fm.popBackStack();
+
+        if(mTwitter != null) mTwitter.shutdown();
+        ImageCache.clear();
+
         sTweetModeFlag = AppUtils.TWEET_MODE_NORMAL;
         sSelectedStatusId = 0;
     }
@@ -138,10 +147,21 @@ public class MainActivity extends FragmentActivity
     @Override
     protected void onStop() {
         super.onStop();
-        if(mTwitter != null) mTwitter.shutdown();
-        ImageCache.clear();
+        Log.i(TAG,"onStop");
+//        if(mTwitter != null) mTwitter.shutdown();
+//        ImageCache.clear();
     }
     
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // レジスター解除
+        if(mReceiver != null) {
+            unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
+    }
+
     /**
      * オプションメニュー生成（最初の一度だけ）
      */
@@ -166,10 +186,10 @@ public class MainActivity extends FragmentActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean ret = true;
+        FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
         switch (item.getItemId()) {
         case R.id.create_new:
             Log.i(TAG,"menu create new ");
-            FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
             TimelineListFragment timelineFragmentR = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
             ColorTheme ct = AppUtils.COLOR_THEME_LIST[AppUtils.loadRightPainColor(this)];
             //timelineFragmentR.setColorTheme(new ColorThemeRed());
@@ -178,6 +198,7 @@ public class MainActivity extends FragmentActivity
             ret = true;
             break;
         case R.id.menu_id_tmp1:
+            fm.popBackStack();
             Log.i(TAG,"menu tmp 1");
             ret = true;
             break;
@@ -285,8 +306,8 @@ public class MainActivity extends FragmentActivity
                 timelineFragmentL.setColorTheme(ctl);
                 //timelineFragmentL.setFragmentId(R.id.timelineFragmentL);
                 // 左ペイン更新
-                timelineFragmentL.setTimelineType(AppUtils.loadLeftPainType(this));
-                timelineFragmentL.updateTimeline(mAccessToken);
+//                timelineFragmentL.setTimelineType(AppUtils.loadLeftPainType(this));
+//                timelineFragmentL.updateTimeline(mAccessToken);
 
                 // 右ペイン
                 TimelineListFragment timelineFragmentR = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
@@ -295,12 +316,14 @@ public class MainActivity extends FragmentActivity
                 timelineFragmentR.setColorTheme(ctr);
                 //timelineFragmentR.setFragmentId(R.id.timelineFragmentR);
                 // 右ペイン更新
-                timelineFragmentR.setTimelineType(AppUtils.loadRightPainType(this));
-                timelineFragmentR.updateTimeline(mAccessToken);
+//                timelineFragmentR.setTimelineType(AppUtils.loadRightPainType(this));
+//                timelineFragmentR.updateTimeline(mAccessToken);
                 
             } else {
                 Log.e(TAG,"change state activity");
                 // 横向き画面に遷移するよ
+
+
                 Intent intent = new Intent(MainActivity.this, MainYokoActivity.class);
                 switch(sTweetModeFlag) {
                     case AppUtils.TWEET_MODE_MENTION:
@@ -324,7 +347,9 @@ public class MainActivity extends FragmentActivity
                         intent.putExtra(AppUtils.TWEET_MODE, AppUtils.TWEET_MODE_NORMAL);
                         break;
                 }
+                // レジスター解除
                 unregisterReceiver(mReceiver);
+                mReceiver = null;
                 startActivity(intent);
                 finish();
             }
@@ -490,15 +515,20 @@ public class MainActivity extends FragmentActivity
         // showCustomToast();
         
         // タイムラインの色を変えますお
-        FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
-        TimelineListFragment timelineFragmentL = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentL);
-        TimelineListFragment timelineFragmentR = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
-        if(fragmentId == R.id.timelineFragmentL) {
-            timelineFragmentL.setSelected(position);
-            timelineFragmentR.setSelected(-1);
-        } else if(fragmentId == R.id.timelineFragmentR) {
-            timelineFragmentR.setSelected(position);
-            timelineFragmentL.setSelected(-1);
+        // 例外キャッチいれときます（SettingFragmentが表にあるときにTimelineFragmentにタッチイベントがいってしまうことがあるので、阻止します）
+        try {
+            FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
+            TimelineListFragment timelineFragmentL = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentL);
+            TimelineListFragment timelineFragmentR = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
+            if(fragmentId == R.id.timelineFragmentL) {
+                timelineFragmentL.setSelected(position);
+                timelineFragmentR.setSelected(-1);
+            } else if(fragmentId == R.id.timelineFragmentR) {
+                timelineFragmentR.setSelected(position);
+                timelineFragmentL.setSelected(-1);
+            }
+        } catch (ClassCastException e) {
+            e.printStackTrace();
         }
     }
 

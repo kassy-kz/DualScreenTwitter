@@ -135,21 +135,49 @@ public class AppUtils {
      * @param context
      * @return タイプの値ね、AppUtils.TIMELINE_TYPE_HOME...etc
      */
+    public static int loadPainType(Context context, int fragmentId) {
+        int type = 0;
+        SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
+        switch(fragmentId) {
+            case R.id.timelineFragmentL:
+                type  = shPref.getInt(LEFT_PAIN_TYPE, 0);
+                break;
+            case R.id.timelineFragmentR:
+                type  = shPref.getInt(RIGHT_PAIN_TYPE, 1);
+                break;
+            case R.id.timelineFragmentHalf:
+                type  = shPref.getInt(HALF_PAIN_TYPE, 0);
+                break;
+            default:
+                break;
+        }
+        return type;
+    }
+    /**
+     * @deprecated
+     */
     public static int loadLeftPainType(Context context) {
         SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
         int type  = shPref.getInt(LEFT_PAIN_TYPE, 0);
         return type;
     }
+    /**
+     * @deprecated
+     */
     public static int loadRightPainType(Context context) {
         SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
         int type  = shPref.getInt(RIGHT_PAIN_TYPE, 1);
         return type;
     }
+    /**
+     * @deprecated
+     */
     public static int loadHalfPainType(Context context) {
         SharedPreferences shPref = context.getSharedPreferences(AppUtils.PREF_FILE_NAME,Context.MODE_PRIVATE);
         int type  = shPref.getInt(HALF_PAIN_TYPE, 0);
         return type;
     }
+
     /**
      * タイムラインのタイプを保存するよ
      * @param context 

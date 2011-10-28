@@ -32,7 +32,7 @@ public class ImageCache {
 				String key = it.next();
 				Bitmap bmp = mImageMap.get(key);
 				if(bmp != null) {
-					bmp.recycle();
+//					bmp.recycle();
 					bmp = null;
 				}
 			}

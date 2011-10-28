@@ -11,6 +11,8 @@
         <TextView
             android:id="@+id/timelineTitleTextView" 
             android:text="tmp"
+            android:textColor="#ffffffff"
+            android:background="@drawable/activity_title_bar"
             android:layout_width="fill_parent" 
             android:layout_height="wrap_content">
         </TextView>

@@ -77,8 +77,13 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
     @Override
     public void onPause() {
         super.onPause();
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        fm.popBackStack();
+//        FragmentManager fm = getActivity().getSupportFragmentManager();
+//        fm.popBackStack();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
     
     private class MyPagerAdapter extends PagerAdapter{

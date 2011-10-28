@@ -2,6 +2,7 @@ package orz.kassy.dts.twitter;
 
 import orz.kassy.dts.async.ThumbnailTask;
 import orz.kassy.dts.image.ImageCache;
+import orz.kassy.dts.twitter.color.ColorTheme;
 import twitter4j.AsyncTwitter;
 import twitter4j.AsyncTwitterFactory;
 import twitter4j.ResponseList;
@@ -18,6 +19,8 @@ import com.google.ads.AdSize;
 import com.google.ads.AdView;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,11 +29,15 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -44,6 +51,8 @@ import android.widget.TextView;
 
 public class MainYokoActivity extends Activity implements OnClickListener {
 
+    private static final int DIALOG_YES_NO_MESSAGE = 1;
+    
     private static final String TAG = "MainYoko";
     private EditText mTweetEditText;
     private long mInReplyTo;
@@ -75,7 +84,7 @@ public class MainYokoActivity extends Activity implements OnClickListener {
         // 横向きなら、改めて頑張りましょう
         setContentView(R.layout.main_full_yoko);
         mSelf = this;
-
+        //Utils.showToast(this, R.string.toast_rotate_info_yoko);
 
         
         // 保存したAccessToken取得
@@ -95,6 +104,8 @@ public class MainYokoActivity extends Activity implements OnClickListener {
         switch(mode) {
             case AppUtils.TWEET_MODE_NORMAL:
                 setTitle(R.string.title_tweet_normal);
+                RelativeLayout rl = (RelativeLayout) findViewById(R.id.tweetRefView);
+                rl.setVisibility(View.GONE);
                 break;
             case AppUtils.TWEET_MODE_REPLY:
                 setTitle(R.string.title_tweet_reply);
@@ -107,7 +118,6 @@ public class MainYokoActivity extends Activity implements OnClickListener {
                 setTweetHeaderView(targetUserName, refText, iconUrl);
                 mTweetEditText.setText("@"+targetUserName+" ");
                 mTweetEditText.setSelection(mTweetEditText.getText().length());
-//                mTweetRefText.setText(refText);
                 break;
             case AppUtils.TWEET_MODE_MENTION:
                 setTitle(R.string.title_tweet_mention);
@@ -263,4 +273,61 @@ public class MainYokoActivity extends Activity implements OnClickListener {
             }
         }
     };
+    
+    
+    /**
+     * オプションメニュー生成（最初の一度だけ）
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // メニューアイテムを追加します
+        getMenuInflater().inflate(R.menu.main_yoko, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    /**
+     *  オプションメニューアイテムが選択された時に呼び出されます
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        boolean ret;
+        switch (item.getItemId()) {
+        case R.id.menu_yoko_clear:
+            showDialog(DIALOG_YES_NO_MESSAGE);
+            ret = true;
+            break;
+        default:
+            ret = super.onOptionsItemSelected(item);
+            break;
+        }
+        return ret;
+    }
+    
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+        case DIALOG_YES_NO_MESSAGE:
+            return new AlertDialog.Builder(this)
+                .setIcon(R.drawable.alert_dialog_icon)
+                .setTitle(R.string.alert_dialog_clear_tweet)
+                .setPositiveButton(R.string.alert_dialog_ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // 消すお
+                        setTitle(R.string.title_tweet_normal);
+                        RelativeLayout rl = (RelativeLayout) findViewById(R.id.tweetRefView);
+                        rl.setVisibility(View.GONE);
+                        mTweetEditText.setText("");
+                    }
+                })
+                .setNegativeButton(R.string.alert_dialog_cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // なにもしないよ
+                    }
+                })
+                .create();
+        }
+        return null;
+    }
+
+
 }

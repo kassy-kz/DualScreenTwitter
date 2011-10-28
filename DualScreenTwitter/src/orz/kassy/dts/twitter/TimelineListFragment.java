@@ -72,39 +72,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     //private int mThisFragmentId = 0;
 
     private boolean mExistList = false;
-    
-    /**
-     * 初期処理３
-     */
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
-        mView = inflater.inflate(R.layout.timelinelist_fragment, container);
-        mListView = (ListView) mView.findViewById(R.id.timelineListView);
-        mListView.setScrollingCacheEnabled(false);
-        mListView.setOnItemClickListener(listItemClickListener);
-        mUpdateButton = (ImageButton)mView.findViewById(R.id.timelineUpdateButton);
-        mUpdateButton.setOnClickListener(this);
-        mSettingButton = (ImageButton)mView.findViewById(R.id.timelineSettingButton);
-        mSettingButton.setOnClickListener(this);
 
-        // リストビューの設定
-        mFooterView = inflater.inflate(R.layout.timeline_footer, null);
-        mListView.addFooterView(mFooterView);
-        mListView.setOnScrollListener(this);
-
-        // プログレスバーの設定
-        mProgressBar = (ProgressBar)mView.findViewById(R.id.timelineProgressBar);
-        mProgressBar.setMax(100); // 水平プログレスバーの最大値を設定
-        //mProgressBar.setProgress(20); // 水平プログレスバーの値を設定
-        //mProgressBar.setSecondaryProgress(60); // 水平プログレスバーのセカンダリ値を設定
-        mHeaderNormal = mView.findViewById(R.id.timelineNormalHeader);
-        mHeaderNormalText = (TextView) mView.findViewById(R.id.timelineTitleTextView);
-        mHeaderProgress = mView.findViewById(R.id.timelineProgressHeader);
-        mHeaderProgressText = (TextView) mView.findViewById(R.id.timelineProgressTitle);
-        return mView;
-    }
-    
     /**
      * 初期処理１
      */
@@ -141,6 +109,49 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
             //mAdapter = new TweetStatusAdapter(getActivity(), statuses);
             Log.e(TAG,"statuses = ");
         }
+    }
+
+    /**
+     * 初期処理３
+     */
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        mView = inflater.inflate(R.layout.timelinelist_fragment, container);
+        mListView = (ListView) mView.findViewById(R.id.timelineListView);
+        mListView.setScrollingCacheEnabled(false);
+        mListView.setOnItemClickListener(listItemClickListener);
+        mUpdateButton = (ImageButton)mView.findViewById(R.id.timelineUpdateButton);
+        mUpdateButton.setOnClickListener(this);
+        mSettingButton = (ImageButton)mView.findViewById(R.id.timelineSettingButton);
+        mSettingButton.setOnClickListener(this);
+
+        // リストビューの設定
+        mFooterView = inflater.inflate(R.layout.timeline_footer, null);
+        mListView.addFooterView(mFooterView);
+        mListView.setOnScrollListener(this);
+
+        // プログレスバーの設定
+        mProgressBar = (ProgressBar)mView.findViewById(R.id.timelineProgressBar);
+        mProgressBar.setMax(100); // 水平プログレスバーの最大値を設定
+        //mProgressBar.setProgress(20); // 水平プログレスバーの値を設定
+        //mProgressBar.setSecondaryProgress(60); // 水平プログレスバーのセカンダリ値を設定
+        mHeaderNormal = mView.findViewById(R.id.timelineNormalHeader);
+        mHeaderNormalText = (TextView) mView.findViewById(R.id.timelineTitleTextView);
+        mHeaderProgress = mView.findViewById(R.id.timelineProgressHeader);
+        mHeaderProgressText = (TextView) mView.findViewById(R.id.timelineProgressTitle);
+        return mView;
+    }
+    
+    /**
+     * 初期処理６
+     */
+    @Override 
+    public void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume");
+        setTimelineType(AppUtils.loadPainType(getActivity(),getId()));
+        updateTimeline(AppUtils.getAccessToken());
     }
     
     @Override
@@ -190,7 +201,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
                 // タイトル文字列の設定
                 mHeaderNormalText.setText(R.string.timelineTitleFavorite);
                 mHeaderProgressText.setText(R.string.timelineTitleFavorite);
-
+                getAsyncFavoritesFirst();
                 break;
             case AppUtils.TIMELINE_TYPE_USERLIST:
                 // タイトル文字列の設定
@@ -202,7 +213,8 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     }
         
     /**
-     * このフラグメント内のリストビューをお気に入りタイムラインで更新しますよ 
+     * このフラグメント内のリストビューをお気に入りタイムラインで更新しますよ
+     * @deprecated 
      */
     public void updateFavorites(AccessToken accessToken) {
         mAccessToken = accessToken;

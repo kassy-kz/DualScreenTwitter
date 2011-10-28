@@ -90,13 +90,45 @@
             <LinearLayout
                 android:id="@+id/admob"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:visibility="visible">
             </LinearLayout>
-        </LinearLayout>
+            <LinearLayout
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:id="@+id/tweetFunctions"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="0dip"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon" />
+                <ImageView
+                    android:layout_width="0dip"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon" />
+                <ImageView
+                    android:layout_width="0dip"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon" />
+                <ImageView
+                    android:layout_width="0dip"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_menu_close_clear_cancel" />
+                </LinearLayout>
+            </LinearLayout>
     </LinearLayout>
+    
+        <!-- 以下　下半身部分 -->
+        
     <LinearLayout 
         android:layout_height="0px"
-        android:layout_weight="1"
+        android:layout_weight="1.2"
         android:layout_width="fill_parent">
     </LinearLayout>
     

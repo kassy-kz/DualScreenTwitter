@@ -10,39 +10,33 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="15dip"
-        android:textColor="#000000"
-        android:background="#ffffffff"
+        android:textColor="#ffffffff"
+        android:background="@drawable/activity_title_bar"
         android:text="@string/setThisPain"
         >
     </TextView>
-    <LinearLayout 
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="#ccffffff">
-        <TextView
-            android:layout_height="fill_parent"
+        android:background="#cceeeeee"
+        android:orientation="horizontal">
+        <ImageView
             android:layout_width="0dip"
             android:layout_weight="1"
-            android:text=""
-            android:textColor="#ff000000"
-            android:gravity="center"/>
-        <TextView
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_media_rew"
+            android:gravity="left" />
+        <ImageView
             android:layout_width="0dip"
             android:layout_weight="1"
-            android:text=">>"
-            android:textColor="#ff000000"
-            android:gravity="center"/>
-    </LinearLayout>
-    <LinearLayout 
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_media_ff"
+            android:gravity="right" />
+        </LinearLayout>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/setTimelineViewPager"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#ccffffff">
-        <android.support.v4.view.ViewPager
-            android:id="@+id/setTimelineViewPager"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="10" />
-    </LinearLayout>
+        android:layout_weight="10" >
+    </android.support.v4.view.ViewPager>
 </LinearLayout>
