@@ -117,10 +117,10 @@ public class HttpServerIF {
 	}
 		
 	private static void log(String strLog) {
-		Log.d(LOG_TAG, strLog);
+//		Log.d(LOG_TAG, strLog);
 	}
 	
 	private static void log(Exception e) {
-		Log.d(LOG_TAG, "", e);
+//		Log.d(LOG_TAG, "", e);
 	}
 }

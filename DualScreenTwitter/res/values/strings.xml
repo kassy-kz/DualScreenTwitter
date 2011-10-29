@@ -42,6 +42,8 @@
     <string name="alert_dialog_clear_tweet">編集中のツイートを削除します</string>
     <string name="alert_dialog_ok">OK</string>
     <string name="alert_dialog_cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="toast_rotate_info_yoko">Please rotate device for timeline mode</string>
     <string name="toast_rotate_info_tate">Please rotate device for tweet mode</string>
 </resources>

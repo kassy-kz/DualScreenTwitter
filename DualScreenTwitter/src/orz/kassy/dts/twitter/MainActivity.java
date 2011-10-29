@@ -32,8 +32,10 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Display;
@@ -61,7 +63,8 @@ import orz.kassy.dts.twitter.color.ColorThemeRed;
  */
 public class MainActivity extends FragmentActivity 
                           implements TimelineListFragment.OnTimelineListItemClickListener, 
-                                     TimelineListFragment.OnSettingButtonClickListener{
+                                     TimelineListFragment.OnSettingButtonClickListener,
+                                     FragmentManager.OnBackStackChangedListener {
     
     private static final String INTENT_ACTION_SLIDE = "com.kyocera.intent.action.SLIDE_OPEN";
     CustomReceiver mReceiver;
@@ -130,12 +133,13 @@ public class MainActivity extends FragmentActivity
 
     @Override
     protected void onResume() {
-        super.onResume();
-        Log.i(TAG,"onResume");
-        
         // SettingFragment解除
         FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
         fm.popBackStack();
+
+        super.onResume();
+        Log.i(TAG,"onResume");
+        
 
         if(mTwitter != null) mTwitter.shutdown();
         ImageCache.clear();
@@ -548,10 +552,13 @@ public class MainActivity extends FragmentActivity
     @Override
     public void onSettingButtonClick(int fragmentId) {
 
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
+
         FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
         TimelineListFragment tlFragment = (TimelineListFragment)fm.findFragmentById(fragmentId);
 
         SettingTimelineFragment sfragment = new SettingTimelineFragment(fragmentId, tlFragment);
+        //sfragment.setRetainInstance(true);
 
         // FragmentTransactionインスタンスを取得する
         android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -571,5 +578,11 @@ public class MainActivity extends FragmentActivity
         ft.addToBackStack(null);
         // Transactionを実行する
         ft.commit();
+        
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        Log.i(TAG,"on Back stack pop");
     }
 }

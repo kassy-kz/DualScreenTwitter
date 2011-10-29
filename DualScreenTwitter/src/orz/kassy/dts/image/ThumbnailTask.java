@@ -1,8 +1,7 @@
-package orz.kassy.dts.async;
+package orz.kassy.dts.image;
 
 import org.apache.http.HttpStatus;
 
-import orz.kassy.dts.image.ImageCache;
 import orz.kassy.dts.web.HttpServerIF;
 
 
@@ -12,10 +11,10 @@ import android.widget.ImageView;
 
 public class ThumbnailTask extends AsyncTask<String, Void, Integer> {
 	private Bitmap mBitmap = null;
-	private ImageView mImage = null;
+	private ImageView mImageView = null;
 	
-	public ThumbnailTask(ImageView image) {
-		mImage = image;
+	public ThumbnailTask(ImageView imageView) {
+		mImageView = imageView;
 	}
 	
 	/**
@@ -25,6 +24,7 @@ public class ThumbnailTask extends AsyncTask<String, Void, Integer> {
 	@Override
 	protected Integer doInBackground(String... params) {
 		String url = params[0];
+		String strKey = params[1];
 		int iRet = 0;
 		if(url != null && url.length() > 0) {
 			HttpServerIF svr = new HttpServerIF();
@@ -32,7 +32,7 @@ public class ThumbnailTask extends AsyncTask<String, Void, Integer> {
 			if(iRet == HttpStatus.SC_OK) {
 				mBitmap = svr.getResBitmap();
 				if(mBitmap != null) {
-					ImageCache.setImage(params[1], mBitmap);
+					ImageCache.setImage(strKey, mBitmap);
 				}
 			}
 		}
@@ -46,7 +46,7 @@ public class ThumbnailTask extends AsyncTask<String, Void, Integer> {
 	protected void onPostExecute(Integer result) {
 		super.onPostExecute(result);
 		if(result == HttpStatus.SC_OK) {
-			mImage.setImageBitmap(mBitmap);
+			mImageView.setImageBitmap(mBitmap);
 		}
 	}
 

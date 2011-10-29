@@ -18,7 +18,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#cceeeeee"
+        android:background="#ffeeeeee"
         android:orientation="horizontal">
         <ImageView
             android:layout_width="0dip"
@@ -36,7 +36,27 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/setTimelineViewPager"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="10" >
+        android:layout_height="0dip"
+        android:layout_weight="1" >
     </android.support.v4.view.ViewPager>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffeeeeee"
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/setFragmentOK"
+            android:text="@string/ok"
+            />
+        <Button
+            android:layout_width="0dip"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/setFragmentCancel"
+            android:text="@string/cancel"
+            />
+    </LinearLayout>
 </LinearLayout>

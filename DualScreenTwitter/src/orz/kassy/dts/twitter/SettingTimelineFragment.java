@@ -6,17 +6,20 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnCheckedChangeListener{        
+public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnCheckedChangeListener, OnClickListener{        
 
     private static final String TAG = "SettingTimelineFrag";
     private static int NUM_OF_VIEWS = 2;
@@ -28,8 +31,14 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
     private View mSetTimelineTypeView;
     private RadioGroup mColorRadioGroup;
     private RadioGroup mTypeRadioGroup;
+    private Button mOkButton;
+    private Button mCancelButton;
     private int mTimelineId;
     private TimelineListFragment mTlFragment = null;
+    
+    // 選択中の設定項目（一時保存）-1は無効な値な
+    private int mTmpFragmentType = -1;
+    private int mTmpFragmentColor = -1;
     
     /**
      * コンストラクタ
@@ -66,6 +75,11 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
         mTypeRadioGroup = (RadioGroup) mSetTimelineTypeView.findViewById(R.id.setTimelineTypeRadio);
         mTypeRadioGroup.setOnCheckedChangeListener(this);
 
+        mOkButton = (Button)view.findViewById(R.id.setFragmentOK);
+        mOkButton.setOnClickListener(this);
+        mCancelButton = (Button)view.findViewById(R.id.setFragmentCancel);
+        mCancelButton.setOnClickListener(this);
+        
         return view;
     }
     
@@ -77,10 +91,17 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
     @Override
     public void onPause() {
         super.onPause();
+        Log.i(TAG,"onPause");
 //        FragmentManager fm = getActivity().getSupportFragmentManager();
 //        fm.popBackStack();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.i(TAG,"onStop");
+    }
+    
     @Override
     public void onResume() {
         super.onResume();
@@ -178,76 +199,77 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
         switch(checkedId){
             case R.id.setTypeHomeTimeline:
                 Log.i(TAG,"selected home time line");
-                if(mTimelineId == R.id.timelineFragmentL) {
-                    AppUtils.saveLeftPainType(getActivity(), AppUtils.TIMELINE_TYPE_HOME);
-                }else if(mTimelineId == R.id.timelineFragmentR) {
-                    AppUtils.saveRightPainType(getActivity(), AppUtils.TIMELINE_TYPE_HOME);
-                }else if(mTimelineId == R.id.timelineFragmentHalf) {
-                    AppUtils.saveHalfPainType(getActivity(), AppUtils.TIMELINE_TYPE_HOME);
-                }
+                mTmpFragmentType = AppUtils.TIMELINE_TYPE_HOME;
                 break;
             case R.id.setTypeFavorites:
                 Log.i(TAG,"selected favorite");
-                if(mTimelineId == R.id.timelineFragmentL) {
-                    AppUtils.saveLeftPainType(getActivity(), AppUtils.TIMELINE_TYPE_FAVORITE);
-                }else if(mTimelineId == R.id.timelineFragmentR) {
-                    AppUtils.saveRightPainType(getActivity(), AppUtils.TIMELINE_TYPE_FAVORITE);
-                }else if(mTimelineId == R.id.timelineFragmentHalf) {
-                    AppUtils.saveHalfPainType(getActivity(), AppUtils.TIMELINE_TYPE_FAVORITE);
-                }
+                mTmpFragmentType = AppUtils.TIMELINE_TYPE_FAVORITE;
                 break;
             case R.id.setTypeMentions:
                 Log.i(TAG,"selected mention");
-                if(mTimelineId == R.id.timelineFragmentL) {
-                    AppUtils.saveLeftPainType(getActivity(), AppUtils.TIMELINE_TYPE_MENTION);
-                }else if(mTimelineId == R.id.timelineFragmentR) {
-                    AppUtils.saveRightPainType(getActivity(), AppUtils.TIMELINE_TYPE_MENTION);
-                }else if(mTimelineId == R.id.timelineFragmentHalf) {
-                    AppUtils.saveHalfPainType(getActivity(), AppUtils.TIMELINE_TYPE_MENTION);
-                }
+                mTmpFragmentType = AppUtils.TIMELINE_TYPE_MENTION;
                 break;
             case R.id.setTypeUserList:
                 Log.i(TAG,"selected user list");
-                if(mTimelineId == R.id.timelineFragmentL) {
-                    AppUtils.saveLeftPainType(getActivity(), AppUtils.TIMELINE_TYPE_USERLIST);
-                }else if(mTimelineId == R.id.timelineFragmentR) {
-                    AppUtils.saveRightPainType(getActivity(), AppUtils.TIMELINE_TYPE_USERLIST);
-                }else if(mTimelineId == R.id.timelineFragmentHalf) {
-                    AppUtils.saveHalfPainType(getActivity(), AppUtils.TIMELINE_TYPE_USERLIST);
-                }
+                mTmpFragmentType = AppUtils.TIMELINE_TYPE_USERLIST;
                 break;
             case R.id.setColorWhite:
-                mTlFragment.setColorTheme(AppUtils.COLOR_THEME_LIST[AppUtils.COLOR_WHITE]);
-                if(mTimelineId == R.id.timelineFragmentL) {
-                    AppUtils.saveLeftPainColor(getActivity(), AppUtils.COLOR_WHITE);
-                }else if(mTimelineId == R.id.timelineFragmentR) {
-                    AppUtils.saveRightPainColor(getActivity(), AppUtils.COLOR_WHITE);
-                }else if(mTimelineId == R.id.timelineFragmentHalf) {
-                    AppUtils.saveHalfPainColor(getActivity(), AppUtils.COLOR_WHITE);
-                }
+                mTmpFragmentColor = AppUtils.COLOR_WHITE;
                 break;
             case R.id.setColorGreen:
-                mTlFragment.setColorTheme(AppUtils.COLOR_THEME_LIST[AppUtils.COLOR_GREEN]);
-                if(mTimelineId == R.id.timelineFragmentL) {
-                    AppUtils.saveLeftPainColor(getActivity(), AppUtils.COLOR_GREEN);
-                }else if(mTimelineId == R.id.timelineFragmentR) {
-                    AppUtils.saveRightPainColor(getActivity(), AppUtils.COLOR_GREEN);
-                }else if(mTimelineId == R.id.timelineFragmentHalf) {
-                    AppUtils.saveHalfPainColor(getActivity(), AppUtils.COLOR_GREEN);
-                }
+                mTmpFragmentColor = AppUtils.COLOR_GREEN;
                 break;
             case R.id.setColorRed:
-                mTlFragment.setColorTheme(AppUtils.COLOR_THEME_LIST[AppUtils.COLOR_RED]);
-                if(mTimelineId == R.id.timelineFragmentL) {
-                    AppUtils.saveLeftPainColor(getActivity(), AppUtils.COLOR_RED);
-                }else if(mTimelineId == R.id.timelineFragmentR) {
-                    AppUtils.saveRightPainColor(getActivity(), AppUtils.COLOR_RED);
-                }else if(mTimelineId == R.id.timelineFragmentHalf) {
-                    AppUtils.saveHalfPainColor(getActivity(), AppUtils.COLOR_RED);
-                }
+                mTmpFragmentColor = AppUtils.COLOR_RED;
                 break;
-                
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+//        FragmentManager fm = getActivity().getSupportFragmentManager();
+//        TimelineListFragment tlFragment = (TimelineListFragment) fm.findFragmentById(mTimelineId);
+        
+        switch(v.getId()) {
+            case R.id.setFragmentOK:
+                // タイプを保存
+                if(mTmpFragmentType != -1) {
+                    if(mTimelineId == R.id.timelineFragmentL) {
+                        AppUtils.saveLeftPainType(getActivity(), mTmpFragmentType);
+                    }else if(mTimelineId == R.id.timelineFragmentR) {
+                        AppUtils.saveRightPainType(getActivity(), mTmpFragmentType);
+                    }else if(mTimelineId == R.id.timelineFragmentHalf) {
+                        AppUtils.saveHalfPainType(getActivity(), mTmpFragmentType);
+                    }
+                    mTlFragment.setTimelineType(mTmpFragmentType);
+                }
+                
+                // カラーを保存
+                if(mTmpFragmentColor != -1) {
+                    mTlFragment.setColorTheme(AppUtils.COLOR_THEME_LIST[mTmpFragmentColor]);
+                    if(mTimelineId == R.id.timelineFragmentL) {
+                        AppUtils.saveLeftPainColor(getActivity(), mTmpFragmentColor);
+                    }else if(mTimelineId == R.id.timelineFragmentR) {
+                        AppUtils.saveRightPainColor(getActivity(), mTmpFragmentColor);
+                    }else if(mTimelineId == R.id.timelineFragmentHalf) {
+                        AppUtils.saveHalfPainColor(getActivity(), mTmpFragmentColor);
+                    }
+                }
+
+                // この際ここで処理するしか方法がなさげだぜ タイムライン更新
+                mTlFragment.updateTimeline(null);
+
+                break;
+
+            case R.id.setFragmentCancel:
+                // なにもしないよ
+                break;
+            default:
+                break;
+        }
+        // そしてこのフラグメントは破棄
+        FragmentManager fm = ((FragmentActivity) getActivity()).getSupportFragmentManager();
+        fm.popBackStack();
     }
 }
 

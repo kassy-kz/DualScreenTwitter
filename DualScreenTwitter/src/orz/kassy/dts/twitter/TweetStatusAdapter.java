@@ -2,8 +2,8 @@ package orz.kassy.dts.twitter;
 
 import java.util.List;
 
-import orz.kassy.dts.async.ThumbnailTask;
 import orz.kassy.dts.image.ImageCache;
+import orz.kassy.dts.image.ThumbnailTask;
 import orz.kassy.dts.twitter.R;
 import orz.kassy.dts.twitter.color.ColorTheme;
 import orz.kassy.dts.twitter.color.ColorThemeWhite;
@@ -76,7 +76,7 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
     
     @Override
     public Status getItem(int position) {
-        Log.i(TAG,"position = "+position);
+        // Log.i(TAG,"position = "+position);
         return mStatusList.get(position);
     }
         
@@ -97,6 +97,7 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
 		} else {
 		    // 使いまわす方
 			holder = (ViewHolder)convertView.getTag();
+			holder.img_icon.setImageResource(R.drawable.prof_none_icon);
 		}
 
 		// 色の設定をするよ
@@ -123,12 +124,17 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
 		holder.lbl_tweet.setText(status.getText());
 
 		// 画像を取得して入れ込むよ
+		// strKey は名前
 		if(ImageCache.getImage(strKey) == null) {
+		    // キャッシュに蓄えはないし、タスクも動いてない
 			if(holder.task == null) {
 				holder.task = new ThumbnailTask(holder.img_icon);
 				holder.task.execute(status.getUser().getProfileImageURL().toString(), strKey);
+            // キャッシュに蓄えはないが、タスクは動いている
 			} else {
-				holder.img_icon.setImageBitmap(null);
+		         holder.img_icon.setImageResource(R.drawable.prof_none_icon);
+
+				//holder.img_icon.setImageBitmap(null);
 				if(holder.task.getStatus() == AsyncTask.Status.FINISHED) {
 					// 受信処理が失敗してたら再度リクエストする。
 					holder.task = new ThumbnailTask(holder.img_icon);

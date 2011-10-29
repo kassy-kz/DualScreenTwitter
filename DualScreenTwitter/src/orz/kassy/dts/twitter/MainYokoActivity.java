@@ -1,7 +1,7 @@
 package orz.kassy.dts.twitter;
 
-import orz.kassy.dts.async.ThumbnailTask;
 import orz.kassy.dts.image.ImageCache;
+import orz.kassy.dts.image.ThumbnailTask;
 import orz.kassy.dts.twitter.color.ColorTheme;
 import twitter4j.AsyncTwitter;
 import twitter4j.AsyncTwitterFactory;

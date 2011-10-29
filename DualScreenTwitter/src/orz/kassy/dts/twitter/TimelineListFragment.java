@@ -154,6 +154,15 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         updateTimeline(AppUtils.getAccessToken());
     }
     
+    /**
+     * 初期処理7
+     */
+    @Override 
+    public void onStart() {
+        super.onStart();
+        Log.i(TAG, "onStart");
+    }
+    
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -178,9 +187,13 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     /**
      * このフラグメントのタイムラインの更新をします
      * 状態フィールドを読んで、どのタイプか判断して更新しますよ
+     * そしてヘッダとかも書き換えるから、まぁよそ者はコレを呼んどけ
+     * @param ぶっちゃけnullでもいい
      */
     public void updateTimeline(AccessToken accessToken) {
-
+        if(accessToken == null) {
+            accessToken = AppUtils.getAccessToken();
+        }
         mAccessToken = accessToken;
         mAsyncTwitter.setOAuthAccessToken(mAccessToken);
 

@@ -2,8 +2,8 @@ package orz.kassy.dts.twitter;
 
 import java.util.List;
 
-import orz.kassy.dts.async.ThumbnailTask;
 import orz.kassy.dts.image.ImageCache;
+import orz.kassy.dts.image.ThumbnailTask;
 import orz.kassy.dts.twitter.R;
 import orz.kassy.dts.twitter.color.ColorTheme;
 import orz.kassy.dts.twitter.color.ColorThemeWhite;
