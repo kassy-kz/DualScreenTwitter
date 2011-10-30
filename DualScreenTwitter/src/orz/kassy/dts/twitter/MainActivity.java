@@ -100,6 +100,7 @@ public class MainActivity extends FragmentActivity
     private static String sSelectedStatusText;
     private static String sSelectedIconUrl;
 
+    private boolean mIsSetting = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -118,6 +119,8 @@ public class MainActivity extends FragmentActivity
         // 保存したAccessToken取得
         mAccessToken = AppUtils.loadAccessToken(this);
 
+        mIsSetting = false;
+        
         // 認証してない場合だけ認証処理するよ
         if(mAccessToken == null) {
             // 認証処理（非同期）
@@ -578,9 +581,13 @@ public class MainActivity extends FragmentActivity
         ft.addToBackStack(null);
         // Transactionを実行する
         ft.commit();
+        mIsSetting = true;
         
     }
 
+    /**
+     * これがよばれたら楽なんだけど、呼ばれないな...
+     */
     @Override
     public void onBackStackChanged() {
         Log.i(TAG,"on Back stack pop");
