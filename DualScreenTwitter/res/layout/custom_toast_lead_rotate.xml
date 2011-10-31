@@ -2,36 +2,35 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:padding="30dip">
+    android:padding="2dip">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:padding="15dip"
+        android:padding="2dip"
         android:background="#333333">
         <LinearLayout
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:paddingLeft="15dip"
-            android:paddingRight="15dip"
-            android:paddingTop="15dip"
-            android:background="#ffffff">
+            android:background="@drawable/btn_default_normal">
             <ImageView
                 android:adjustViewBounds="true"
-                android:src="@android:drawable/ic_menu_rotate"
+                android:src="@drawable/rotate_to_yoko"
                 android:layout_width="70dip"
-                android:layout_height="70dip"
-                android:id="@+id/imageview"></ImageView>
+                android:layout_height="fill_parent"
+                android:id="@+id/imageview"
+                android:layout_centerVertical="true"></ImageView>
             <TextView
                 android:id="@+id/textview"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:layout_marginTop="10dip"
                 android:layout_marginBottom="10dip"
-                android:text="@string/customToastRotateText"
+                android:text="@string/customToastRotateToYokoText"
                 android:textColor="#ff000000"
                 android:textStyle="bold"
+                android:layout_centerVertical="true"
                 android:gravity="center" />
         </LinearLayout>
     </LinearLayout>

@@ -100,8 +100,9 @@ public class MainActivity extends FragmentActivity
     private static String sSelectedStatusText;
     private static String sSelectedIconUrl;
 
-    private boolean mIsSetting = false;
-
+    private static boolean sIsSetting = false;
+    private int mToastCount = 3;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,8 +110,7 @@ public class MainActivity extends FragmentActivity
 
         // Echo DTS Setting 
         DualScreen.restrictOrientationAtFullScreen( this, ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED );
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-        
+
         // Register intent receiver.
         mReceiver = new CustomReceiver();
         IntentFilter slideFilter = new IntentFilter(INTENT_ACTION_SLIDE);
@@ -119,7 +119,8 @@ public class MainActivity extends FragmentActivity
         // 保存したAccessToken取得
         mAccessToken = AppUtils.loadAccessToken(this);
 
-        mIsSetting = false;
+        sIsSetting = false;
+        mToastCount = 2;
         
         // 認証してない場合だけ認証処理するよ
         if(mAccessToken == null) {
@@ -136,19 +137,25 @@ public class MainActivity extends FragmentActivity
 
     @Override
     protected void onResume() {
-        // SettingFragment解除
-        FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
-        fm.popBackStack();
 
         super.onResume();
         Log.i(TAG,"onResume");
-        
 
         if(mTwitter != null) mTwitter.shutdown();
         ImageCache.clear();
 
         sTweetModeFlag = AppUtils.TWEET_MODE_NORMAL;
         sSelectedStatusId = 0;
+    }
+    
+    @Override 
+    protected void onPause() {
+        // SettingFragment解除
+        FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
+        fm.popBackStackImmediate();
+//        android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//        ft.remove(SettingTimelineFragment.sInstance);
+        super.onPause();
     }
 
     @Override
@@ -311,26 +318,16 @@ public class MainActivity extends FragmentActivity
                 // 左ペインのカラー設定
                 ColorTheme ctl = AppUtils.COLOR_THEME_LIST[AppUtils.loadLeftPainColor(this)];
                 timelineFragmentL.setColorTheme(ctl);
-                //timelineFragmentL.setFragmentId(R.id.timelineFragmentL);
-                // 左ペイン更新
-//                timelineFragmentL.setTimelineType(AppUtils.loadLeftPainType(this));
-//                timelineFragmentL.updateTimeline(mAccessToken);
 
                 // 右ペイン
                 TimelineListFragment timelineFragmentR = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentR);
                 // 右ペインのカラー設定
                 ColorTheme ctr = AppUtils.COLOR_THEME_LIST[AppUtils.loadRightPainColor(this)];
                 timelineFragmentR.setColorTheme(ctr);
-                //timelineFragmentR.setFragmentId(R.id.timelineFragmentR);
-                // 右ペイン更新
-//                timelineFragmentR.setTimelineType(AppUtils.loadRightPainType(this));
-//                timelineFragmentR.updateTimeline(mAccessToken);
                 
             } else {
                 Log.e(TAG,"change state activity");
                 // 横向き画面に遷移するよ
-
-
                 Intent intent = new Intent(MainActivity.this, MainYokoActivity.class);
                 switch(sTweetModeFlag) {
                     case AppUtils.TWEET_MODE_MENTION:
@@ -362,11 +359,13 @@ public class MainActivity extends FragmentActivity
             }
         } else {
             // for normal screen
-            if( width > height ) {
-                // normal yoko
-                setContentView(R.layout.main_half_yoko);
-            } else {
+//            if( width > height ) {
+//                // normal yoko
+//                setContentView(R.layout.main_half_tate);
+//            } else {
                 // normal tate
+
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 setContentView(R.layout.main_half_tate);
                 
                 // ハーフペイン
@@ -383,7 +382,7 @@ public class MainActivity extends FragmentActivity
 //                FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
 //                TimelineListFragment timelineFragmentHalf = (TimelineListFragment)fm.findFragmentById(R.id.timelineFragmentHalf);
 //                timelineFragmentHalf.updateHomeTimeLine(mAccessToken);
-            }
+//            }
         }
     }
 	
@@ -519,7 +518,7 @@ public class MainActivity extends FragmentActivity
         sTweetModeFlag = AppUtils.TWEET_MODE_REPLY;
         
         // カスタムトーストを表示しますお
-        // showCustomToast();
+        showCustomToast();
         
         // タイムラインの色を変えますお
         // 例外キャッチいれときます（SettingFragmentが表にあるときにTimelineFragmentにタッチイベントがいってしまうことがあるので、阻止します）
@@ -540,21 +539,26 @@ public class MainActivity extends FragmentActivity
     }
 
     private void showCustomToast() {
-        LayoutInflater inflater = getLayoutInflater();
-        View v = inflater.inflate(R.layout.custom_toast_lead_rotate, null);
-        Toast mToast = new Toast(this);
-        mToast.setDuration(Toast.LENGTH_LONG);
-        mToast.setView(v);
-        mToast.show();
+        if(mToastCount > 0){
+            LayoutInflater inflater = getLayoutInflater();
+            View v = inflater.inflate(R.layout.custom_toast_lead_rotate, null);
+            Toast mToast = new Toast(this);
+            mToast.setDuration(Toast.LENGTH_LONG);
+            mToast.setView(v);
+            mToast.show();
+            mToastCount--;
+        }
     }
     
     /**
      * フラグメントの設定ボタンが押されたら...
      * 設定フラグメントに遷移してみよう
+     * @deprecated
      */
     @Override
     public void onSettingButtonClick(int fragmentId) {
 
+        String backStack = null;
         getSupportFragmentManager().addOnBackStackChangedListener(this);
 
         FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();
@@ -570,21 +574,30 @@ public class MainActivity extends FragmentActivity
             Log.e(TAG,"left fragment menu pressed");
             // 置き換えレイアウト上の位置／トランジションアニメーションを指定する
             ft.replace(R.id.timelineFragmentL, sfragment);
+            backStack = "LEFT";
         }else if(fragmentId == R.id.timelineFragmentR){
             Log.e(TAG,"right fragment menu pressed");
             // 置き換えレイアウト上の位置／トランジションアニメーションを指定する
             ft.replace(R.id.timelineFragmentR, sfragment);
+            backStack = "RIGHT";
         }
 
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         // バックスタックに入れる
-        ft.addToBackStack(null);
+        ft.addToBackStack(backStack);
         // Transactionを実行する
         ft.commit();
-        mIsSetting = true;
+        sIsSetting = true;
         
     }
 
+    public static void setIsSetting(boolean b) {
+        sIsSetting = b;
+    }
+    public static boolean getIsSetting() {
+        return sIsSetting;
+    }
+    
     /**
      * これがよばれたら楽なんだけど、呼ばれないな...
      */

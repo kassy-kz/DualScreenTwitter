@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class TweetStatusAdapter extends ArrayAdapter<Status> {
@@ -104,11 +105,16 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
 		holder.lbl_screenname.setTextColor(mColorTheme.getTextColor());
         holder.lbl_tweet.setTextColor(mColorTheme.getTextColor());
         convertView.setBackgroundColor(0x00000000);
+
         // 選択されてる奴は特別だぜ
         if(position == mSelectedPosition){
             holder.lbl_screenname.setTextColor(0xffff0000);
             holder.lbl_tweet.setTextColor(0xffff0000);
             convertView.setBackgroundColor(0xff00ff00);
+            
+//            View footerView = mInflater.inflate(R.layout.timeline_item_select_footer, null);
+//            ((ViewGroup)convertView).addView(footerView,3);
+ 
         }
 		
         // 文言を入れ込むよ

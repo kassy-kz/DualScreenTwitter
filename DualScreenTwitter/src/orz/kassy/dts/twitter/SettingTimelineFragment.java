@@ -2,6 +2,7 @@ package orz.kassy.dts.twitter;
 
 import orz.kassy.dts.twitter.color.ColorTheme;
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -39,6 +40,9 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
     // 選択中の設定項目（一時保存）-1は無効な値な
     private int mTmpFragmentType = -1;
     private int mTmpFragmentColor = -1;
+
+    public int commitId = 0;
+    public static SettingTimelineFragment sInstance;
     
     /**
      * コンストラクタ
@@ -49,15 +53,18 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
         mTlFragment = tlFragment;
         mTimelineId = timelineId;
     }
+
+    public SettingTimelineFragment() {
+        super();
+    }
     
     /**
      * フラグメント標準の初期処理
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
-
+        sInstance = this;
         View view = inflater.inflate(R.layout.set_timeline_fragment, container, false);
         mContext = getActivity();
 
@@ -80,6 +87,8 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
         mCancelButton = (Button)view.findViewById(R.id.setFragmentCancel);
         mCancelButton.setOnClickListener(this);
         
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+
         return view;
     }
     
@@ -92,13 +101,17 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
     public void onPause() {
         super.onPause();
         Log.i(TAG,"onPause");
-//        FragmentManager fm = getActivity().getSupportFragmentManager();
-//        fm.popBackStack();
+
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+
+//        android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+//        ft.remove(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        MainActivity.setIsSetting(false);
         Log.i(TAG,"onStop");
     }
     
@@ -229,10 +242,20 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
     public void onClick(View v) {
 //        FragmentManager fm = getActivity().getSupportFragmentManager();
 //        TimelineListFragment tlFragment = (TimelineListFragment) fm.findFragmentById(mTimelineId);
-        
+
+        String backStack = null;
         switch(v.getId()) {
             case R.id.setFragmentOK:
-                // タイプを保存
+                
+                // バックスタックの名前
+                if(mTimelineId == R.id.timelineFragmentL) {
+                    backStack = "LEFT";
+                }else if(mTimelineId == R.id.timelineFragmentR) {
+                    backStack = "RIGHT";
+                }else if(mTimelineId == R.id.timelineFragmentHalf) {
+                }
+
+                // タイプを保存 
                 if(mTmpFragmentType != -1) {
                     if(mTimelineId == R.id.timelineFragmentL) {
                         AppUtils.saveLeftPainType(getActivity(), mTmpFragmentType);

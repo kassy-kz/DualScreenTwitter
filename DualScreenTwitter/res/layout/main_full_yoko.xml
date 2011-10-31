@@ -19,7 +19,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:padding="5dip"
-
                 >
                 <ImageView
                     android:layout_width="50dip"
@@ -99,7 +98,8 @@
                 android:id="@+id/tweetFunctions"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
                 <ImageView
                     android:layout_width="0dip"
                     android:layout_weight="1"

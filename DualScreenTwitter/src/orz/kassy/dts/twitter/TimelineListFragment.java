@@ -521,19 +521,33 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     
     
     private void createSettingFragment() {
-
+        if(MainActivity.getIsSetting()) {
+            Utils.showToast(getActivity(), R.string.toast_cannot_create_setting);
+            return;
+        }
+        String backStack = null;
         FragmentManager fm = ((FragmentActivity) getActivity()).getSupportFragmentManager();
         TimelineListFragment tlFragment = (TimelineListFragment)fm.findFragmentById(getId());
 
+        // バックスタックを指定する
+        if(getId() == R.id.timelineFragmentL){
+            backStack = "LEFT";
+        }else if(getId() == R.id.timelineFragmentR){
+            backStack = "RIGHT";
+        }
+        
         SettingTimelineFragment sfragment = new SettingTimelineFragment(getId(), tlFragment);
 
         // FragmentTransactionインスタンスを取得する
         android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(getId(), sfragment);
+        //ft.replace(getId(), sfragment);
+        ft.add(getId(), sfragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         // バックスタックに入れる
         ft.addToBackStack(null);
         // Transactionを実行する
-        ft.commit();
+        sfragment.commitId = ft.commit();
+        MainActivity.setIsSetting(true);
+        
     }
 }
