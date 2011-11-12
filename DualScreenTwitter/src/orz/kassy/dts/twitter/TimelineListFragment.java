@@ -489,6 +489,10 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
                 Paging paging = new Paging(mPageCount, 20);
                 getAsyncMentions(paging, true);            
                 mPageCount++;
+            } else if(mFragmentMode == AppUtils.TIMELINE_TYPE_FAVORITE) {
+                Paging paging = new Paging(mPageCount, 20);
+                getAsyncFavorites(paging, true);            
+                mPageCount++;
             }
         }
     }
