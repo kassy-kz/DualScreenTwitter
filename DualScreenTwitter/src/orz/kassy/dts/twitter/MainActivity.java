@@ -430,7 +430,7 @@ public class MainActivity extends FragmentActivity
             // ダイアログを表示
             mDialog = new ProgressDialog(mActivity);
             mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            mDialog.setMessage("認証処理をしています...");
+            mDialog.setMessage(getString(R.string.authorizing));
             mDialog.setCancelable(true);
             mDialog.setOnDismissListener(mDismissListener);
             mDialog.show();

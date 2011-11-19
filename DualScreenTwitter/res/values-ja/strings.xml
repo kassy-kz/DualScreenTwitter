@@ -44,6 +44,8 @@
     <string name="alert_dialog_cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="authorizing">認証処理をしています...</string>
+    <string name="auth_fail">認証失敗しました</string>
     <string name="toast_cannot_create_setting">Sorry, please complete opposite pain setting</string>
     <string name="toast_rotate_info_yoko">Please rotate device for timeline mode</string>
     <string name="toast_rotate_info_tate">Please rotate device for tweet mode</string>

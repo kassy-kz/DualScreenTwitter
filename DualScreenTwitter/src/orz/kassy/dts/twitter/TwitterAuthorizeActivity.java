@@ -35,7 +35,7 @@ public class TwitterAuthorizeActivity extends Activity implements OnClickListene
 				strUrl = extras.getString("authurl");
 			}
 		} else {
-		    Utils.showToast(this, "認証失敗しました... ");
+		    Utils.showToast(this, R.string.auth_fail);
 			finish();
 		}
 		WebView webview = (WebView)findViewById(R.id.webview);
