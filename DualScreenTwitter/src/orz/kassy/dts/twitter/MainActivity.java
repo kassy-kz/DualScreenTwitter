@@ -17,8 +17,8 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.TwitterListener;
 import twitter4j.TwitterMethod;
-import twitter4j.http.AccessToken;
-import twitter4j.http.RequestToken;
+import twitter4j.auth.AccessToken;
+import twitter4j.auth.RequestToken;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -558,7 +558,7 @@ public class MainActivity extends FragmentActivity
     @Override
     public void onSettingButtonClick(int fragmentId) {
 
-        String backStack = null;
+        String backStack = "tmp";
         getSupportFragmentManager().addOnBackStackChangedListener(this);
 
         FragmentManager fm = ((FragmentActivity) mSelf).getSupportFragmentManager();

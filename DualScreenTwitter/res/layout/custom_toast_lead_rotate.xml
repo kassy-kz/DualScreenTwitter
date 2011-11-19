@@ -1,13 +1,14 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:padding="2dip">
+    android:layout_height="fill_parent">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:padding="2dip"
+        android:paddingTop="4dip"
+        android:paddingBottom="1dip"
         android:background="#333333">
         <LinearLayout
             android:orientation="horizontal"

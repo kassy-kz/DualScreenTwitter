@@ -14,7 +14,7 @@ import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.view.Display;
 import android.view.WindowManager;
-import twitter4j.http.AccessToken;
+import twitter4j.auth.AccessToken;
 
 public class AppUtils {
     

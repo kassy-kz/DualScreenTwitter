@@ -2,9 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="lib" path="/Developer/Android/externals/twitter4j-core-2.1.12-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="/Developer/Android/android-sdk-mac_x86/extras/android/compatibility/v4/android-support-v4.jar"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="lib" path="libs/GoogleAdMobAdsSdk-4.1.1.jar"/>
+	<classpathentry kind="lib" path="libs/twitter4j-core-android-2.2.5.jar"/>
+	<classpathentry kind="lib" path="libs/twitter4j-async-android-2.2.5.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

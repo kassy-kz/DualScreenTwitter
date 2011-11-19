@@ -11,7 +11,7 @@ import twitter4j.TwitterAdapter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterListener;
 import twitter4j.TwitterMethod;
-import twitter4j.http.AccessToken;
+import twitter4j.auth.AccessToken;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
@@ -88,8 +88,9 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
                     + " must implement OnPhotoListItemClickListener");
         }
         
-        AsyncTwitterFactory factory = new AsyncTwitterFactory(mAsyncTwitterListener);
+        AsyncTwitterFactory factory = new AsyncTwitterFactory();
         mAsyncTwitter = factory.getInstance();
+        mAsyncTwitter.addListener(mAsyncTwitterListener);
         mAsyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
         mAsyncTwitter.setOAuthAccessToken(mAccessToken);
     }
@@ -525,10 +526,10 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     
     
     private void createSettingFragment() {
-        if(MainActivity.getIsSetting()) {
-            Utils.showToast(getActivity(), R.string.toast_cannot_create_setting);
-            return;
-        }
+//        if(MainActivity.getIsSetting()) {
+//            Utils.showToast(getActivity(), R.string.toast_cannot_create_setting);
+//            return;
+//        }
         String backStack = null;
         FragmentManager fm = ((FragmentActivity) getActivity()).getSupportFragmentManager();
         TimelineListFragment tlFragment = (TimelineListFragment)fm.findFragmentById(getId());
@@ -548,7 +549,9 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         ft.add(getId(), sfragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         // バックスタックに入れる
-        ft.addToBackStack(null);
+        //ft.addToBackStack(null);
+        Log.w("backstack",backStack);
+        ft.addToBackStack(backStack);
         // Transactionを実行する
         sfragment.commitId = ft.commit();
         MainActivity.setIsSetting(true);

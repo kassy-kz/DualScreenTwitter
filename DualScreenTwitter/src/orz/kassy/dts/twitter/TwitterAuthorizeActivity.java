@@ -29,6 +29,11 @@ public class TwitterAuthorizeActivity extends Activity implements OnClickListene
 		btn.setOnClickListener(this);
 		
 		Bundle extras = getIntent().getExtras();
+
+		// おまじない
+		System.setProperty("http.keepAlive", "false"); 
+		System.setProperty("https.keepAlive", "false"); 
+		
 		// 認証用ページのURLを読みだすよ
 		if(extras != null) {
 			if(extras.containsKey("authurl")) {

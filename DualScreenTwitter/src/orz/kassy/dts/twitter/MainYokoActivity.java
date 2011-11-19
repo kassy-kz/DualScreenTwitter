@@ -12,7 +12,7 @@ import twitter4j.TwitterAdapter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterListener;
 import twitter4j.TwitterMethod;
-import twitter4j.http.AccessToken;
+import twitter4j.auth.AccessToken;
 
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
@@ -195,8 +195,9 @@ public class MainYokoActivity extends Activity implements OnClickListener {
         mDialog.setOnDismissListener(mDismissListener);
         mDialog.show();
         
-        AsyncTwitterFactory factory = new AsyncTwitterFactory(mAsyncTwitterListener);
+        AsyncTwitterFactory factory = new AsyncTwitterFactory();
         AsyncTwitter asyncTwitter = factory.getInstance();
+        asyncTwitter.addListener(mAsyncTwitterListener);
         asyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
         asyncTwitter.setOAuthAccessToken(mAccessToken);
         asyncTwitter.updateStatus(statusUpdate);

@@ -239,18 +239,18 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
 //        FragmentManager fm = getActivity().getSupportFragmentManager();
 //        TimelineListFragment tlFragment = (TimelineListFragment) fm.findFragmentById(mTimelineId);
 
-        String backStack = null;
+        String backStack = "tmp";
+
+        // バックスタックの名前
+        if(mTimelineId == R.id.timelineFragmentL) {
+            backStack = "LEFT";
+        }else if(mTimelineId == R.id.timelineFragmentR) {
+            backStack = "RIGHT";
+        }else if(mTimelineId == R.id.timelineFragmentHalf) {
+        }
+
         switch(v.getId()) {
             case R.id.setFragmentOK:
-                
-                // バックスタックの名前
-                if(mTimelineId == R.id.timelineFragmentL) {
-                    backStack = "LEFT";
-                }else if(mTimelineId == R.id.timelineFragmentR) {
-                    backStack = "RIGHT";
-                }else if(mTimelineId == R.id.timelineFragmentHalf) {
-                }
-
                 // タイプを保存 
                 if(mTmpFragmentType != -1) {
                     if(mTimelineId == R.id.timelineFragmentL) {
@@ -281,6 +281,7 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
                 break;
 
             case R.id.setFragmentCancel:
+                
                 // なにもしないよ
                 break;
             default:
@@ -288,7 +289,9 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
         }
         // そしてこのフラグメントは破棄
         FragmentManager fm = ((FragmentActivity) getActivity()).getSupportFragmentManager();
-        fm.popBackStack();
+        Log.w("backstack",backStack);
+        fm.popBackStack(backStack,FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//        fm.popBackStack();
     }
 }
 
