@@ -28,6 +28,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -62,6 +63,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     private TextView mHeaderNormalText;
     private View mHeaderProgress;
     private TextView mHeaderProgressText;
+    private LinearLayout mFirstProgress;
 
     // フラグメントモード　ホームタイムラインか、メンションか、とか...
     private int mFragmentMode;
@@ -72,6 +74,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
     //private int mThisFragmentId = 0;
 
     private boolean mExistList = false;
+
 
     /**
      * 初期処理１
@@ -141,6 +144,8 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         mHeaderNormalText = (TextView) mView.findViewById(R.id.timelineTitleTextView);
         mHeaderProgress = mView.findViewById(R.id.timelineProgressHeader);
         mHeaderProgressText = (TextView) mView.findViewById(R.id.timelineProgressTitle);
+        
+        mFirstProgress = (LinearLayout)mView.findViewById(R.id.timeline_first_progress);
         return mView;
     }
     
@@ -355,13 +360,14 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         public void gotHomeTimeline(ResponseList<Status> statuses) {
             mIsUpdating = false;
             mProgressBar.setProgress(90);
-
+            
             // 追加取得の場合
             if(mListAddFlag) {
                 mAdapter.addAll(statuses);
                 mHandler.post(new Runnable(){
                     @Override
                     public void run() {
+                        mFirstProgress.setVisibility(View.GONE);
                         mAdapter.notifyDataSetChanged();
                         completeProgressBar();
                     }
@@ -374,6 +380,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
                 mHandler.post(new Runnable(){
                     @Override
                     public void run() {
+                        mFirstProgress.setVisibility(View.GONE);
                         mListView.setAdapter(mAdapter);
                         completeProgressBar();
                     }
@@ -393,6 +400,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
                 mHandler.post(new Runnable(){
                     @Override
                     public void run() {
+                        mFirstProgress.setVisibility(View.GONE);
                         mAdapter.notifyDataSetChanged();
                         completeProgressBar();
                     }
@@ -404,6 +412,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
                 mHandler.post(new Runnable(){
                     @Override
                     public void run() {
+                        mFirstProgress.setVisibility(View.GONE);
                         mListView.setAdapter(mAdapter);                   
                         completeProgressBar();
                     }
@@ -419,6 +428,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
             mHandler.post(new Runnable(){
                 @Override
                 public void run() {
+                    mFirstProgress.setVisibility(View.GONE);
                     mListView.setAdapter(mAdapter);                   
                     mProgressBar.setProgress(100);
                     mHeaderNormal.setVisibility(View.VISIBLE);
@@ -433,6 +443,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
+                    mFirstProgress.setVisibility(View.GONE);
                     Utils.showToast(getActivity(), R.string.msg_tweetError);
                 }
             });
@@ -530,7 +541,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
 //            Utils.showToast(getActivity(), R.string.toast_cannot_create_setting);
 //            return;
 //        }
-        String backStack = null;
+        String backStack = "tmp";
         FragmentManager fm = ((FragmentActivity) getActivity()).getSupportFragmentManager();
         TimelineListFragment tlFragment = (TimelineListFragment)fm.findFragmentById(getId());
 

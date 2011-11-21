@@ -1,5 +1,6 @@
 package orz.kassy.dts.twitter;
 
+import java.util.Date;
 import java.util.List;
 
 import orz.kassy.dts.image.ImageCache;
@@ -94,10 +95,15 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
 			holder.lbl_screenname = (TextView)convertView.findViewById(R.id.lbl_screenname);
 			// holder.lbl_name = (TextView)convertView.findViewById(R.id.lbl_name);
 			holder.lbl_tweet = (TextView)convertView.findViewById(R.id.lbl_tweet);
+			holder.lbl_time=(TextView)convertView.findViewById(R.id.lbl_time);
 			convertView.setTag(holder);
 		} else {
 		    // 使いまわす方
 			holder = (ViewHolder)convertView.getTag();
+			if(holder.task!=null) {
+			    holder.task.cancel(true);
+			    holder.task=null;
+			}
 			holder.img_icon.setImageResource(R.drawable.prof_none_icon);
 		}
 
@@ -129,6 +135,27 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
         // holder.lbl_name.setText(strKey);
 		holder.lbl_tweet.setText(status.getText());
 
+		// 時刻いれこむよ
+		Date now = new Date(); 
+		Date tweetDate = status.getCreatedAt();
+		String strDate = null;
+		String hour = null;
+		String min = null;
+		if((tweetDate.getHours() ) < 10){
+		    hour = "0"+(tweetDate.getHours());
+		} else {
+            hour = ""+(tweetDate.getHours());		    
+		}
+		if(tweetDate.getMinutes() <10 ) {
+            min = "0"+(tweetDate.getMinutes());
+        } else {
+            min = ""+(tweetDate.getMinutes());           
+		}
+
+		strDate = (tweetDate.getMonth()+1)+"/"+tweetDate.getDate() + "   " + hour + ":" + min ;
+		holder.lbl_time.setText(strDate);
+		
+		
 		// 画像を取得して入れ込むよ
 		// strKey は名前
 		if(ImageCache.getImage(strKey) == null) {
@@ -138,13 +165,13 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
 				holder.task.execute(status.getUser().getProfileImageURL().toString(), strKey);
             // キャッシュに蓄えはないが、タスクは動いている
 			} else {
-		         holder.img_icon.setImageResource(R.drawable.prof_none_icon);
+		        // holder.img_icon.setImageResource(R.drawable.prof_none_icon);
 
 				//holder.img_icon.setImageBitmap(null);
 				if(holder.task.getStatus() == AsyncTask.Status.FINISHED) {
 					// 受信処理が失敗してたら再度リクエストする。
-					holder.task = new ThumbnailTask(holder.img_icon);
-					holder.task.execute(status.getUser().getProfileImageURL().toString(), strKey);						
+					//holder.task = new ThumbnailTask(holder.img_icon);
+					//holder.task.execute(status.getUser().getProfileImageURL().toString(), strKey);						
 				}
 			}
 		} else {
@@ -156,6 +183,7 @@ public class TweetStatusAdapter extends ArrayAdapter<Status> {
     class ViewHolder {
         ImageView img_icon;
         TextView lbl_screenname;
+        TextView lbl_time;
         TextView lbl_name;
         TextView lbl_tweet;
         ThumbnailTask task;

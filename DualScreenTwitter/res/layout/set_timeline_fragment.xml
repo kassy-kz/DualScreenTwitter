@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:textSize="15dip"
         android:textColor="#ffffffff"
-        android:background="@drawable/activity_title_bar"
         android:text="@string/setThisPain"
+        android:background="@drawable/dark_header"
         >
     </TextView>
     <LinearLayout

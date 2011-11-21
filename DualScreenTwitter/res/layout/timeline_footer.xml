@@ -11,13 +11,13 @@
         android:layout_gravity="center_vertical"
     />
     <TextView
-        android:text="update"
+        android:text="@string/getting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/timelineFooterText"
-        android:textSize="20dip"
+        android:textSize="15dip"
         android:textStyle="bold"
         android:gravity="center_vertical"
-        android:layout_gravity="center_vertical"
-    />
+        android:layout_gravity="top"
+        android:layout_marginLeft="20dip"/>
 </LinearLayout>

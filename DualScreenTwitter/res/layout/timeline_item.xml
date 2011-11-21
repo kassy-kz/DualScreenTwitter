@@ -9,6 +9,7 @@
         android:layout_width="50dip"
         android:layout_alignParentLeft="true"
         android:layout_height="50dip"
+        android:layout_marginTop="2dip"
         android:id="@+id/img_icon"></ImageView>
     <TextView
         android:text="aaaa"
@@ -21,12 +22,25 @@
         android:layout_marginLeft="5dip"
         android:layout_toRightOf="@+id/img_icon"></TextView>
     <TextView
+        android:text="time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/lbl_time"
+        android:textSize="12dip"
+        android:layout_alignTop="@id/img_icon"
+        android:gravity="right"
+        android:textColor="#ee222222"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dip"
+        android:layout_toRightOf="@+id/img_icon"></TextView>
+    <TextView
         android:text="bbbb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/lbl_tweet"
         android:textSize="14dip"
         android:layout_marginLeft="5dip"
+        android:layout_marginTop="2dip"
         android:layout_toRightOf="@+id/img_icon"
         android:layout_below="@+id/lbl_screenname"></TextView>
 </RelativeLayout>

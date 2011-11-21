@@ -45,7 +45,8 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="authorizing">Authorizing...</string>    
-    <string name="auth_fail">Sorry, failed authorizing</string>    
+    <string name="auth_fail">Sorry, failed authorizing</string>        
+    <string name="getting">getting tweet... </string>
     <string name="toast_cannot_create_setting">Sorry, please complete opposite pain setting</string>
     <string name="toast_rotate_info_yoko">Please rotate device for timeline mode</string>
     <string name="toast_rotate_info_tate">Please rotate device for tweet mode</string>
