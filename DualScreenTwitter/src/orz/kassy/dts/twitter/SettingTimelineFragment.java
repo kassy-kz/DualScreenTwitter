@@ -246,6 +246,10 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
 //                Log.i(TAG,"selected user list");
 //                selectUserList();
 //                break;
+            case R.id.setTypeProfileLine:
+                Log.i(TAG,"selected profile");
+                mTmpFragmentType = AppUtils.TIMELINE_TYPE_PROFILELINE;
+                break;
             case R.id.setColorWhite:
                 mTmpFragmentColor = AppUtils.COLOR_WHITE;
                 break;

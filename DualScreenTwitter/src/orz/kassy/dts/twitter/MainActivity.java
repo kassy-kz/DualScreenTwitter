@@ -517,6 +517,7 @@ public class MainActivity extends FragmentActivity
     @Override
     public void onTimelineListItemClick(int fragmentId, int position, Status status) {
         //Log.e(TAG,"Clicked Timeline item" + statusId);
+        if(status == null)return;
         sSelectedStatusId = status.getId();
         sSelectedStatusUserName = status.getUser().getScreenName();
         sSelectedIconUrl = status.getUser().getProfileImageURL().toString();

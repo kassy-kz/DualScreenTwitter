@@ -21,6 +21,7 @@
     <string name="twitter_auth_error">Sorry, failed to authenticate</string>
     <string name="btn_pin">PIN</string>
     <string name="twitter_timeline_title">TimeLine</string>
+    <string name="timelineTitleProfileLine">Profile</string>
     <string name="no_timeline">There is no timeline</string>
     <string name="auth_wait_message">Now authentication</string>
     <string name="wait_timeline_message">getting timeline</string>
@@ -34,6 +35,8 @@
     <string name="timelineTitleFavorite">Favorites</string>
     <string name="timelineTitleUserList">List</string>
     <string name="msg_tweetError">Sorry, failed to send your tweet</string>
+    <string name="msg_gettweetError">Sorry, failed to get timeline. Wait a minute and retry, please</string>
+    <string name="msg_getTweetLimit">There is no more tweet</string>
     <string name="customToastRotateToYokoText">Please expand and rotate \n device for Tweet mode</string>
     <string name="white">White</string>
     <string name="green">Green</string>
@@ -49,6 +52,7 @@
     <string name="authorizing">Authorizing...</string>    
     <string name="auth_fail">Sorry, failed authorizing</string>        
     <string name="getting">getting tweet... </string>
+    <string name="no_more_item">no more item</string>
     <string name="toast_cannot_create_setting">Sorry, please complete opposite pain setting</string>
     <string name="toast_rotate_info_yoko">Please rotate device for timeline mode</string>
     <string name="toast_rotate_info_tate">Please rotate device for tweet mode</string>

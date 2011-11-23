@@ -71,10 +71,12 @@ public class AppUtils {
     public static final int TIMELINE_TYPE_MENTION = 1;
     public static final int TIMELINE_TYPE_FAVORITE = 2;
     public static final int TIMELINE_TYPE_USERLIST = 3;
+    public static final int TIMELINE_TYPE_PROFILELINE = 4;
     public static final int[] TIMELINE_TYPE_LIST = {TIMELINE_TYPE_HOME, 
                                                     TIMELINE_TYPE_MENTION, 
                                                     TIMELINE_TYPE_FAVORITE,
-                                                    TIMELINE_TYPE_USERLIST
+                                                    TIMELINE_TYPE_USERLIST,
+                                                    TIMELINE_TYPE_PROFILELINE
                                                     };
 
     // アクセストークンを保持してみる（仮だからな）
