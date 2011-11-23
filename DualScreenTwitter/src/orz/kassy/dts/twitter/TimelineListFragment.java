@@ -247,7 +247,6 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         getAsyncFavoritesFirst();
     }
 
-
     /**
      * カラー変更しますよ
      */
@@ -258,15 +257,6 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
             mAdapter.setColorTheme(colorTheme);
             mAdapter.notifyDataSetChanged();
         }
-    }
-    
-    /**
-     * このフラグメントのレイアウトIDをセットします。
-     * onclicklistenerでどのフラグメントが叩かれたか把握するためにね
-     * @deprecated
-     */
-    public void setFragmentId(int fragmentId) {
-        //mThisFragmentId  = fragmentId;
     }
     
     /**
@@ -562,7 +552,7 @@ public class TimelineListFragment extends Fragment implements OnClickListener, O
         // バックスタックに入れる
         //ft.addToBackStack(null);
         Log.w("backstack",backStack);
-        ft.addToBackStack(backStack);
+        //ft.addToBackStack(backStack);
         // Transactionを実行する
         sfragment.commitId = ft.commit();
         MainActivity.setIsSetting(true);

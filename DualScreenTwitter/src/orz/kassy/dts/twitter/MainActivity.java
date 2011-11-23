@@ -1,7 +1,6 @@
 package orz.kassy.dts.twitter;
 
 import orz.kassy.dts.image.ImageCache;
-
 import com.google.ads.AdRequest;
 import com.google.ads.AdSize;
 import com.google.ads.AdView;
@@ -20,6 +19,8 @@ import twitter4j.TwitterMethod;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -91,6 +92,7 @@ public class MainActivity extends FragmentActivity
 
 	private static final int MENU_ID_MENU1 = (Menu.FIRST + 1);
     private static final int MENU_ID_MENU2 = (Menu.FIRST + 2);
+    protected static final int DIALOG_SINGLE_CHOICE = 0;
 
     // スタイルチェンジの時に引き継ぐ値たちね
     // スタイルチェンジではActivityが生成され直すから、staticにする必要があるのよ
@@ -116,13 +118,13 @@ public class MainActivity extends FragmentActivity
         IntentFilter slideFilter = new IntentFilter(INTENT_ACTION_SLIDE);
         registerReceiver(mReceiver, slideFilter);
 
-        // 保存したAccessToken取得
+        // 保存したAccessToken取得 OAuthのテストするときはここをコメントにしようね
         mAccessToken = AppUtils.loadAccessToken(this);
 
         sIsSetting = false;
         mToastCount = 2;
         
-        // 認証してない場合だけ認証処理するよ
+        // 認証してない場合だけ認証処理するよ(WebViewに飛んでOAuthするやつね)
         if(mAccessToken == null) {
             // 認証処理（非同期）
             mTask = new AuthAsyncTask(this);
@@ -286,6 +288,10 @@ public class MainActivity extends FragmentActivity
 	private Runnable mRunnable_List_update = new Runnable() {
 	    @Override
 	    public void run() {
+            // ダイアログ消して
+            if(mDialog != null) {
+                mDialog.dismiss();
+            }
 	        setScreenLayout();
 	    }
 	};
@@ -605,4 +611,5 @@ public class MainActivity extends FragmentActivity
     public void onBackStackChanged() {
         Log.i(TAG,"on Back stack pop");
     }
+    
 }

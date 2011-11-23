@@ -1,7 +1,20 @@
 package orz.kassy.dts.twitter;
 
 import orz.kassy.dts.twitter.color.ColorTheme;
+import twitter4j.AsyncTwitter;
+import twitter4j.AsyncTwitterFactory;
+import twitter4j.PagableResponseList;
+import twitter4j.ResponseList;
+import twitter4j.Status;
+import twitter4j.TwitterAdapter;
+import twitter4j.TwitterListener;
+import twitter4j.UserList;
+import twitter4j.auth.AccessToken;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,6 +22,7 @@ import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -19,16 +33,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnCheckedChangeListener, OnClickListener{        
 
     private static final String TAG = "SettingTimelineFrag";
+    protected static final int DIALOG_SINGLE_CHOICE = 1;
     private static int NUM_OF_VIEWS = 2;
     private static int[] mViewColor = {Color.RED, Color.BLACK, Color.BLUE, Color.GREEN, Color.DKGRAY};
     private Activity mContext;
     private MyPagerAdapter mPagerAdapter;
     private ViewPager mViewPager;
     private View mSetColorView;
+    
     private View mSetTimelineTypeView;
     private RadioGroup mColorRadioGroup;
     private RadioGroup mTypeRadioGroup;
@@ -36,12 +53,15 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
     private Button mCancelButton;
     private int mTimelineId;
     private TimelineListFragment mTlFragment = null;
-    
+    private ProgressDialog mDialog = null;
+
     // 選択中の設定項目（一時保存）-1は無効な値な
     private int mTmpFragmentType = -1;
     private int mTmpFragmentColor = -1;
 
     public int commitId = 0;
+    private AsyncTwitter mAsyncTwitter;
+    private AccessToken mAccessToken = null;
     public static SettingTimelineFragment sInstance;
     
     /**
@@ -222,6 +242,10 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
                 Log.i(TAG,"selected mention");
                 mTmpFragmentType = AppUtils.TIMELINE_TYPE_MENTION;
                 break;
+//            case R.id.setTypeUserList:
+//                Log.i(TAG,"selected user list");
+//                selectUserList();
+//                break;
             case R.id.setColorWhite:
                 mTmpFragmentColor = AppUtils.COLOR_WHITE;
                 break;
@@ -233,6 +257,43 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
                 break;
         }
     }
+
+    private void selectUserList() {
+        AsyncTwitterFactory factory = new AsyncTwitterFactory();
+        mAsyncTwitter = factory.getInstance();
+        mAsyncTwitter.addListener(mAsyncTwitterListener);
+        mAsyncTwitter.setOAuthConsumer(AppUtils.CONSUMER_KEY, AppUtils.CONSUMER_SECRET);
+        mAccessToken = AppUtils.loadAccessToken(getActivity());
+        mAsyncTwitter.setOAuthAccessToken(mAccessToken);
+        mAsyncTwitter.getUserLists("kassy_kz", -1);
+        mDialog = new ProgressDialog(getActivity());
+        mDialog.setMessage(getString(R.string.wait_get_userlist));
+        mDialog.setIndeterminate(true);
+        mDialog.show();
+    }
+    
+    TwitterListener mAsyncTwitterListener = new TwitterAdapter() {
+        @Override
+        public void gotUserLists(PagableResponseList<UserList> userLists) {
+            // ダイアログ消して
+            if(mDialog != null) {
+                mDialog.dismiss();
+            }
+            // ダイアログ作ります。Builder使う関連で、処理はActivityに任せます
+            getActivity().showDialog(MainActivity.DIALOG_SINGLE_CHOICE);
+            final CharSequence[] items = {"Red", "Green", "Blue"};
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Pick a color");
+            builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
+                    Toast.makeText(getActivity(), items[item], Toast.LENGTH_SHORT).show();
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
+    };
 
     @Override
     public void onClick(View v) {
@@ -290,8 +351,14 @@ public class  SettingTimelineFragment extends Fragment implements RadioGroup.OnC
         // そしてこのフラグメントは破棄
         FragmentManager fm = ((FragmentActivity) getActivity()).getSupportFragmentManager();
         Log.w("backstack",backStack);
-        fm.popBackStack(backStack,FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        //fm.popBackStack(backStack,FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.remove(this);
+        ft.commit();
+        
 //        fm.popBackStack();
     }
+    
+    
 }
 
