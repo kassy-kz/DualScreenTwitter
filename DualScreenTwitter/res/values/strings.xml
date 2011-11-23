@@ -24,6 +24,8 @@
     <string name="no_timeline">There is no timeline</string>
     <string name="auth_wait_message">Now authentication</string>
     <string name="wait_timeline_message">getting timeline</string>
+    <string name="choice_list">Choice List</string>
+    <string name="wait_get_userlist">getting list</string>
     <string name="title_tweet_normal">New tweet</string>
     <string name="title_tweet_reply">Reply tweet</string>
     <string name="title_tweet_mention">Mention tweet</string>

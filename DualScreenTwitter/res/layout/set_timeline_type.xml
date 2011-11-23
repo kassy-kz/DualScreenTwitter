@@ -31,6 +31,12 @@
             android:text="@string/timelineTitleFavorite"
             android:textColor="#000000"
             android:id="@+id/setTypeFavorites" />
+<!-- 
+        <RadioButton
+            android:text="@string/timelineTitleUserList"
+            android:textColor="#000000"
+            android:id="@+id/setTypeUserList" />
+ -->
     </RadioGroup>
     
 </LinearLayout>
